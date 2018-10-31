@@ -1,0 +1,12 @@
+
+go.property("mode", 0)
+
+function init(self)
+	self.time = 0
+end
+
+function update(self, dt)
+
+	self.time = self.time + dt
+	go.set("#label", "time", vmath.vector4(self.time,self.mode,0,1))
+end
