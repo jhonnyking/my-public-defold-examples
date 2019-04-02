@@ -1,0 +1,12 @@
+images {
+  image: "/main/alpha_soft.png"
+}
+images {
+  image: "/main/alpha_filt.png"
+}
+images {
+  image: "/main/alpha_frame.png"
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

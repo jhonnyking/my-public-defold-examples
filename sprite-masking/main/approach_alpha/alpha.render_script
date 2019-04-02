@@ -1,0 +1,34 @@
+local function stretch_projection(near, far)
+    return vmath.matrix4_orthographic(0, render.get_width(), 0, render.get_height(), near, far)
+end
+
+local function get_projection(self)
+    return self.projection_fn(self.near, self.far, self.zoom)
+end
+
+function init(self)
+    self.alpha_pred = render.predicate({"alpha"})
+    self.tile_pred  = render.predicate({"tile"})
+
+    self.clear_color   = vmath.vector4(0, 0, 0, 0)
+
+    self.view          = vmath.matrix4()
+    self.near          = -1
+    self.far           = 1
+    self.projection_fn = stretch_projection
+end
+
+function update(self)
+    render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
+    render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+
+    render.set_depth_mask(false)
+    render.disable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_CULL_FACE)
+    render.disable_state(render.STATE_STENCIL_TEST)
+    render.enable_state(render.STATE_BLEND)
+    render.set_view(self.view)
+    render.set_projection(get_projection(self))
+    render.draw(self.alpha_pred)
+    render.draw(self.tile_pred)
+end

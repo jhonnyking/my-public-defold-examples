@@ -1,0 +1,49 @@
+local function stretch_projection(near, far)
+    return vmath.matrix4_orthographic(0, render.get_width(), 0, render.get_height(), near, far)
+end
+
+local function get_projection(self)
+    return self.projection_fn(self.near, self.far, self.zoom)
+end
+
+function init(self)
+    self.blocker_pred  = render.predicate({"blocker"})
+    self.tile_pred     = render.predicate({"tile"})
+    self.clear_color   = vmath.vector4(0.25, 0.25, 0.25, 0.25)
+    self.view          = vmath.matrix4()
+    self.near          = -1
+    self.far           = 1
+    self.projection_fn = stretch_projection
+end
+
+function update(self)
+    render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
+
+    render.disable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_CULL_FACE)
+    render.enable_state(render.STATE_STENCIL_TEST)
+    render.set_stencil_mask(0xFF)
+
+    render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+    
+    render.set_view(self.view)
+    render.set_projection(get_projection(self))
+
+    render.set_depth_mask(false)
+    render.set_color_mask(false, false, false, false)
+
+    render.set_stencil_func(render.COMPARE_FUNC_ALWAYS, 1, 0xFF)
+    render.set_stencil_op(render.STENCIL_OP_KEEP, render.STENCIL_OP_KEEP, render.STENCIL_OP_REPLACE)
+    render.draw(self.blocker_pred)
+    
+    render.set_depth_mask(true)
+    render.set_color_mask(true, true, true, true)
+    render.set_stencil_mask(0x0)
+    render.set_stencil_func(render.COMPARE_FUNC_EQUAL, 1, 0xFF)
+    
+    render.enable_state(render.STATE_BLEND)
+    render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
+
+    render.draw(self.tile_pred)
+    render.disable_state(render.STATE_STENCIL_TEST)
+end

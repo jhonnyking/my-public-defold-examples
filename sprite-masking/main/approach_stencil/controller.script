@@ -1,0 +1,24 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	self.move_vec = vmath.vector3()
+	self.moved    = false
+	self.blocker  = go.get_id("/blocker")
+end
+
+function update(self, dt)
+	if self.moved then
+		local p = go.get_position(self.blocker)
+		p = p + self.move_vec
+		go.set_position(p,self.blocker)
+		
+		self.move_vec = vmath.vector3()
+		self.moved    = false
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") then
+		self.move_vec = self.move_vec + vmath.vector3(action.dx,action.dy,0)
+		self.moved    = true
+	end
+end
