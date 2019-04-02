@@ -7,7 +7,6 @@ local function get_projection(self)
 end
 
 function init(self)
-    self.alpha_pred = render.predicate({"alpha"})
     self.tile_pred  = render.predicate({"tile"})
 
     self.clear_color   = vmath.vector4(0, 0, 0, 0)
@@ -29,6 +28,5 @@ function update(self)
     render.enable_state(render.STATE_BLEND)
     render.set_view(self.view)
     render.set_projection(get_projection(self))
-    render.draw(self.alpha_pred)
     render.draw(self.tile_pred)
 end

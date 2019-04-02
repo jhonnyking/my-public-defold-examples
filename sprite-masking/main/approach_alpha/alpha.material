@@ -1,5 +1,5 @@
 name: "blocker"
-tags: "alpha"
+tags: "tile"
 vertex_program: "/builtins/materials/sprite.vp"
 fragment_program: "/main/approach_alpha/alpha.fp"
 vertex_space: VERTEX_SPACE_WORLD
