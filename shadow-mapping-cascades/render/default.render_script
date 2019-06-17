@@ -1,0 +1,271 @@
+local function create_depth_buffer(w,h)
+    local color_params = {
+        format     = render.FORMAT_RGBA,
+        width      = w,
+        height     = h,
+        min_filter = render.FILTER_NEAREST,
+        mag_filter = render.FILTER_NEAREST,
+        u_wrap     = render.WRAP_CLAMP_TO_EDGE,
+        v_wrap     = render.WRAP_CLAMP_TO_EDGE }
+        
+    local depth_params = { 
+        format        = render.FORMAT_DEPTH,
+        width         = w,
+        height        = h,
+        min_filter    = render.FILTER_NEAREST,
+        mag_filter    = render.FILTER_NEAREST,
+        u_wrap        = render.WRAP_CLAMP_TO_EDGE,
+        v_wrap        = render.WRAP_CLAMP_TO_EDGE }
+
+    return render.render_target("shadow_buffer", {[render.BUFFER_COLOR_BIT] = color_params, [render.BUFFER_DEPTH_BIT] = depth_params })
+end
+
+function create_cascade(size, dbg_color)
+    local c             = {}
+    c.buffer            = create_depth_buffer(size, size)
+    c.projection        = vmath.matrix4()
+    c.constants         = render.constant_buffer()
+    c.constants.u_color = dbg_color
+    return c
+end
+
+function init(self)
+
+    self.shadow_pred       = render.predicate({"shadow"})
+    self.shadow_debug_pred = render.predicate({"shadow_debug"})
+    self.model_pred        = render.predicate({"model"})
+    self.tile_pred         = render.predicate({"tile"})
+    self.gui_pred          = render.predicate({"gui"})
+    self.text_pred         = render.predicate({"text"})
+    self.particle_pred     = render.predicate({"particle"})
+
+    self.clear_color = vmath.vector4(0.25, 0.25, 0.25, 0.25)
+    self.view        = nil
+
+    self.near = -1
+    self.far  = 1
+    self.zoom = 1
+    self.fov  = 45
+    self.proj = vmath.matrix4()
+
+    local cascade_size     = 1024
+    self.light_cascades    = {}
+    self.light_cascades[1] = create_cascade(cascade_size, vmath.vector4(1,0,0,1))
+    self.light_cascades[2] = create_cascade(cascade_size, vmath.vector4(0,1,0,1))
+    self.light_cascades[3] = create_cascade(cascade_size, vmath.vector4(0,0,1,1))
+    self.light_cascade_limits = {0,0,0,0}
+
+    self.light_transform       = vmath.matrix4()
+    self.light_projection      = vmath.matrix4()
+    self.light_constant_buffer = render.constant_buffer()
+
+    self.bias_matrix    = vmath.matrix4()
+    self.bias_matrix.c0 = vmath.vector4(0.5, 0.0, 0.0, 0.0)
+    self.bias_matrix.c1 = vmath.vector4(0.0, 0.5, 0.0, 0.0)
+    self.bias_matrix.c2 = vmath.vector4(0.0, 0.0, 0.5, 0.0)
+    self.bias_matrix.c3 = vmath.vector4(0.5, 0.5, 0.5, 1.0)
+end
+
+function render_view(self)    
+    local w = render.get_window_width()
+    local h = render.get_window_height()
+    
+    render.set_viewport(self.view.x * w, self.view.y * h, self.view.w * w, self.view.h * h)
+    render.set_view(self.view.transform)
+
+    for k, v in pairs(self.light_cascades) do
+        render.enable_texture(k, v.buffer, render.BUFFER_COLOR_BIT)
+    end
+    
+    render.draw(self.model_pred, self.light_constant_buffer)
+
+    for k, v in pairs(self.light_cascades) do
+        render.disable_texture(k)
+    end
+    
+    render.draw(self.tile_pred)
+    render.draw(self.particle_pred)
+    render.draw_debug3d()
+end
+
+function render_gui(self)
+    -- render GUI
+    --
+    render.set_view(vmath.matrix4())
+    render.set_projection(vmath.matrix4_orthographic(0, render.get_window_width(), 0, render.get_window_height(), -1, 1))
+    render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
+
+    render.enable_state(render.STATE_STENCIL_TEST)
+    render.draw(self.gui_pred)
+    render.draw(self.text_pred)
+    render.disable_state(render.STATE_STENCIL_TEST)
+end
+
+function render_scene(self)
+    local w         = render.get_window_width()
+    local h         = render.get_window_height()
+    local proj      = vmath.matrix4_perspective(self.fov, w/h, self.near, self.far)
+    local mtx_light = self.bias_matrix * self.light_projection * self.light_transform
+    local inv_light = vmath.inv(self.light_transform)
+    local light     = vmath.vector4()
+
+    light.x = inv_light.m03
+    light.y = inv_light.m13
+    light.z = inv_light.m23
+    light.w = 1
+    
+    self.proj = proj
+    self.light_constant_buffer.mtx_light_mvp0 = mtx_light.c0
+    self.light_constant_buffer.mtx_light_mvp1 = mtx_light.c1
+    self.light_constant_buffer.mtx_light_mvp2 = mtx_light.c2
+    self.light_constant_buffer.mtx_light_mvp3 = mtx_light.c3
+    self.light_constant_buffer.light = light
+
+    render.set_projection(self.proj)
+    render.set_color_mask(true, true, true, true)
+    render.set_depth_mask(true)
+    render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+
+    render.enable_state(render.STATE_DEPTH_TEST)
+    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
+    render.disable_state(render.STATE_STENCIL_TEST)
+    render.enable_state(render.STATE_BLEND)
+    render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
+
+    --render.enable_state(render.STATE_CULL_FACE)
+    render.set_cull_face(render.FACE_BACK)
+    --render.disable_state(render.STATE_CULL_FACE)
+
+    render_view(self)
+end
+
+function update_cascades(self)
+    local view_inv      = vmath.inv(self.view.transform)
+    local aspect        = render.get_height() / render.get_width()
+    local tan_half_hfov = math.tan(math.rad(self.fov / 2.0))
+    local tan_half_vfov = math.tan(math.rad((self.fov * aspect) / 2.0))
+
+    for i = 1, #self.light_cascades do
+        local xn = self.light_cascade_limits[i]     * tan_half_hfov
+        local xf = self.light_cascade_limits[i + 1] * tan_half_hfov
+        local yn = self.light_cascade_limits[i]     * tan_half_vfov
+        local yf = self.light_cascade_limits[i + 1] * tan_half_vfov
+
+        local frustum_corners = {
+            vmath.vector4( xn,  yn, self.light_cascade_limits[i], 1.0),
+            vmath.vector4(-xn,  yn, self.light_cascade_limits[i], 1.0),
+            vmath.vector4( xn, -yn, self.light_cascade_limits[i], 1.0),
+            vmath.vector4(-xn, -yn, self.light_cascade_limits[i], 1.0),
+            
+            vmath.vector4( xf,  yf, self.light_cascade_limits[i + 1], 1.0),
+            vmath.vector4(-xf,  yf, self.light_cascade_limits[i + 1], 1.0),
+            vmath.vector4( xf, -yf, self.light_cascade_limits[i + 1], 1.0),
+            vmath.vector4(-xf, -yf, self.light_cascade_limits[i + 1], 1.0),
+        }
+
+        local frustum_corners_light = {}
+        local frustum_min = vmath.vector3(1e10,1e10,1e10)
+        local frustum_max = vmath.vector3(-frustum_min.x,-frustum_min.y,-frustum_min.z)
+
+        for k, v in pairs(frustum_corners) do
+            local vx_world = view_inv * v
+            local vx_light = self.light_transform * vx_world
+            frustum_min.x  = math.min(frustum_min.x, vx_light.x)
+            frustum_min.y  = math.min(frustum_min.y, vx_light.y)
+            frustum_min.z  = math.min(frustum_min.z, vx_light.z)
+            frustum_max.x  = math.max(frustum_max.x, vx_light.x)
+            frustum_max.y  = math.max(frustum_max.y, vx_light.y)
+            frustum_max.z  = math.max(frustum_max.z, vx_light.z)
+        end
+
+        -- pprint(frustum_min, frustum_max)
+
+        self.light_cascades[i].projection = vmath.matrix4_orthographic(
+            frustum_min.x, frustum_max.x,
+            frustum_min.y, frustum_max.y,
+            frustum_min.z, frustum_max.z)
+    end
+end
+
+function render_cascade(self, c)
+    local w = render.get_render_target_width(c.buffer, render.BUFFER_DEPTH_BIT)
+    local h = render.get_render_target_height(c.buffer, render.BUFFER_DEPTH_BIT)
+
+    render.set_projection(c.projection)
+    render.set_viewport(0, 0, w, h)
+
+    render.set_render_target(c.buffer, { transient = {render.BUFFER_DEPTH_BIT} })
+    render.clear({[render.BUFFER_COLOR_BIT] = vmath.vector4(0,0,0,1), [render.BUFFER_DEPTH_BIT] = 1})
+    render.draw(self.model_pred, c.constants)
+end
+
+function render_shadows(self)
+    render.enable_material("shadow")
+    render.set_depth_mask(true)
+    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
+    render.enable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_BLEND)
+    render.disable_state(render.STATE_CULL_FACE)
+    render.set_view(self.light_transform)
+
+    update_cascades(self)
+
+    for k, v in pairs(self.light_cascades) do
+        render_cascade(self, v);
+    end
+    
+    render.disable_material()
+    render.set_render_target(render.RENDER_TARGET_DEFAULT)
+end
+
+function render_shadows_overlay(self)
+    local s = 3
+    local w = render.get_window_width()/s
+    local x = render.get_window_width() - w
+    local h = render.get_window_height()/s
+    local y = render.get_window_height() - h
+    
+    render.set_projection(vmath.matrix4())
+    render.set_view(vmath.matrix4())
+
+    render.set_depth_mask(false)
+    render.disable_state(render.STATE_DEPTH_TEST)
+
+    for k, v in pairs(self.light_cascades) do
+        render.set_viewport(x, y - (k-1) * h, w, h)
+        render.enable_texture(0, v.buffer, render.BUFFER_COLOR_BIT)
+        render.draw(self.shadow_debug_pred)
+        render.disable_texture(0)
+    end
+end
+
+function update(self)
+    render_shadows(self)
+    render_scene(self)
+    render_shadows_overlay(self)
+    render_gui(self)
+end
+
+function calculate_cascade_limits(self)
+    self.light_cascade_limits[1] = self.near
+    self.light_cascade_limits[2] = self.far / 10
+    self.light_cascade_limits[3] = self.far / 5
+    self.light_cascade_limits[4] = self.far
+end
+
+function on_message(self, message_id, message)
+    if message_id == hash("clear_color") then
+        self.clear_color = message.color
+    elseif message_id == hash("set_light_transform") then
+        self.light_transform = message.transform
+        self.light_direction = message.direction
+    elseif message_id == hash("set_light_projection") then
+        self.light_projection = message.projection
+    elseif message_id == hash("set_view") then
+        self.view = message
+    elseif message_id == hash("set_near_far") then
+        self.near = message.near
+        self.far = message.far
+        calculate_cascade_limits(self)
+    end
+end
