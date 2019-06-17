@@ -7,22 +7,31 @@ local function translate_matrix(mat,pos)
 	return mat
 end
 
+local function get_rotation_from_yaw_pitch(yaw,pitch)
+	return vmath.quat_rotation_x(math.rad(pitch)) * vmath.quat_rotation_y(math.rad(yaw))
+end
+
 -- Calculates a view matrix from euler degrees
-local function get_matrix_from_yaw_pitch_zoom(yaw,pitch,zoom)
-	local rot = vmath.quat_rotation_x(math.rad(pitch)) * vmath.quat_rotation_y(math.rad(yaw))
-	local mat = vmath.matrix4_from_quat(rot)
+local function get_matrix_from_rot_zoom(quat,zoom)
+	local mat = vmath.matrix4_from_quat(quat)
 	return translate_matrix(mat,vmath.vector3(0,0,-zoom))
 end
 
 function init(self)
 	self.views    = {}
 	self.views[1] = { x = 0, y = 0, w = 1, h = 1, transform = vmath.matrix4() }
-	self.light    = get_matrix_from_yaw_pitch_zoom(45,45,10)
 
 	self.yaw   = 90
 	self.pitch = 45
 	self.zoom  = 20
 	self.time  = 0
+
+	self.light_yaw       = 45
+	self.light_pitch     = 45
+	self.light_zoom      = 10
+	self.light_rotation  = get_rotation_from_yaw_pitch(self.light_yaw,self.light_pitch)
+	self.light_vector    = vmath.normalize(vmath.rotate(self.light_rotation, vmath.vector3(0,0,1)))
+	self.light_transform = get_matrix_from_rot_zoom(self.light_rotation,self.light_zoom)
 
 	-- Use this for directional lights
 	local proj_w = 50
@@ -38,7 +47,7 @@ function init(self)
 
 	msg.post(".", "acquire_input_focus")
 	msg.post("@render:", "set_light_projection", { projection = proj })
-	msg.post("@render:", "set_light_transform",  { transform  = self.light })
+	msg.post("@render:", "set_light_transform",  { transform  = self.light_transform, direction = self.light_vector })
 	msg.post("@render:", "set_near_far",         { near = 0.1, far = 60 })
 end
 
@@ -46,7 +55,7 @@ function update(self, dt)
 	self.time = self.time + dt
 	
 	-- Update camera
-	self.views[1].transform = get_matrix_from_yaw_pitch_zoom(self.yaw,self.pitch,self.zoom)	
+	self.views[1].transform = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
 	msg.post("@render:", "set_view", self.views)
 
 	-- Update scene
