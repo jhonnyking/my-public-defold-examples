@@ -106,20 +106,23 @@ function render_scene(self)
     local h         = render.get_window_height()
     local proj      = vmath.matrix4_perspective(self.fov, w/h, self.near, self.far)
     local mtx_light = self.bias_matrix * self.light_projection * self.light_transform
-    local inv_light = vmath.inv(self.light_transform)
-    local light     = vmath.vector4()
-
-    light.x = inv_light.m03
-    light.y = inv_light.m13
-    light.z = inv_light.m23
-    light.w = 1
     
     self.proj = proj
-    self.light_constant_buffer.mtx_light_mvp0 = mtx_light.c0
-    self.light_constant_buffer.mtx_light_mvp1 = mtx_light.c1
-    self.light_constant_buffer.mtx_light_mvp2 = mtx_light.c2
-    self.light_constant_buffer.mtx_light_mvp3 = mtx_light.c3
-    self.light_constant_buffer.light = light
+
+    for k, v in pairs(self.light_cascades) do
+        local mtx_light = v.projection * self.light_transform
+
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv0"] = mtx_light.c0
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv1"] = mtx_light.c1
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv2"] = mtx_light.c2
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv3"] = mtx_light.c3
+    end
+
+    self.light_constant_buffer.u_cascade_limits = vmath.vector4(
+        self.light_cascade_limits[1],
+        self.light_cascade_limits[2],
+        self.light_cascade_limits[3],
+        self.light_cascade_limits[4])
 
     render.set_projection(self.proj)
     render.set_color_mask(true, true, true, true)
@@ -140,7 +143,7 @@ function render_scene(self)
 end
 
 function update_cascades(self)
-    local view_inv      = vmath.inv(self.view.transform)
+    local view_inv      =  vmath.inv(self.view.transform)
     local aspect        = render.get_height() / render.get_width()
     local tan_half_hfov = math.tan(math.rad(self.fov / 2.0))
     local tan_half_vfov = math.tan(math.rad((self.fov * aspect) / 2.0))
@@ -173,12 +176,13 @@ function update_cascades(self)
             frustum_min.x  = math.min(frustum_min.x, vx_light.x)
             frustum_min.y  = math.min(frustum_min.y, vx_light.y)
             frustum_min.z  = math.min(frustum_min.z, vx_light.z)
+
             frustum_max.x  = math.max(frustum_max.x, vx_light.x)
             frustum_max.y  = math.max(frustum_max.y, vx_light.y)
             frustum_max.z  = math.max(frustum_max.z, vx_light.z)
         end
 
-        -- pprint(frustum_min, frustum_max)
+        --pprint(frustum_min, frustum_max)
 
         self.light_cascades[i].projection = vmath.matrix4_orthographic(
             frustum_min.x, frustum_max.x,
@@ -235,8 +239,9 @@ function render_shadows_overlay(self)
         render.set_viewport(x, y - (k-1) * h, w, h)
         render.enable_texture(0, v.buffer, render.BUFFER_COLOR_BIT)
         render.draw(self.shadow_debug_pred)
-        render.disable_texture(0)
     end
+
+    render.disable_texture(0)
 end
 
 function update(self)

@@ -14,33 +14,48 @@ uniform mediump mat4 mtx_world;
 uniform mediump mat4 mtx_proj;
 uniform mediump mat4 mtx_normal;
 
-uniform mediump vec4 light;
-uniform mediump vec4 mtx_light_mvp0;
-uniform mediump vec4 mtx_light_mvp1;
-uniform mediump vec4 mtx_light_mvp2;
-uniform mediump vec4 mtx_light_mvp3;
+uniform mediump vec4 mtx_light_0_mvp0;
+uniform mediump vec4 mtx_light_0_mvp1;
+uniform mediump vec4 mtx_light_0_mvp2;
+uniform mediump vec4 mtx_light_0_mvp3;
+
+uniform mediump vec4 mtx_light_1_mvp0;
+uniform mediump vec4 mtx_light_1_mvp1;
+uniform mediump vec4 mtx_light_1_mvp2;
+uniform mediump vec4 mtx_light_1_mvp3;
+
+uniform mediump vec4 mtx_light_2_mvp0;
+uniform mediump vec4 mtx_light_2_mvp1;
+uniform mediump vec4 mtx_light_2_mvp2;
+uniform mediump vec4 mtx_light_2_mvp3;
 
 varying mediump vec4 var_position;
 varying mediump vec4 var_position_world;
+varying mediump vec4 var_position_clip;
 varying mediump vec3 var_normal;
 varying mediump vec2 var_texcoord0;
-varying mediump vec4 var_texcoord0_shadow;
-varying mediump vec4 var_light;
+varying mediump vec4 var_texcoord0_shadow[3];
 
-mat4 get_shadow_mat()
+mat4 get_shadow_mat(vec4 c0, vec4 c1, vec4 c2, vec4 c3)
 {
-    return mat4(mtx_light_mvp0, mtx_light_mvp1, mtx_light_mvp2, mtx_light_mvp3);
+    return mat4(c0,c1,c2,c3);
 }
 
 void main()
 {
     vec4 p               = mtx_worldview * vec4(position.xyz, 1.0);
-    var_light            = mtx_view * vec4(light.xyz, 1.0);
+    vec4 p_w             = mtx_world * vec4(position.xyz, 1.0);
+    
     var_position         = p;
-    var_position_world   = mtx_world * vec4(position.xyz, 1.0);
+    var_position_world   = p_w;
     var_texcoord0        = texcoord0;
-    var_texcoord0_shadow = get_shadow_mat() * mtx_world * vec4(position.xyz, 1.0);
     var_normal           = normalize((mtx_normal * vec4(normal, 0.0)).xyz);
-    gl_Position          = mtx_proj * p;
+
+    var_texcoord0_shadow[0] = get_shadow_mat(mtx_light_0_mvp0, mtx_light_0_mvp1, mtx_light_0_mvp2, mtx_light_0_mvp3) * p_w;
+    var_texcoord0_shadow[1] = get_shadow_mat(mtx_light_1_mvp0, mtx_light_1_mvp1, mtx_light_1_mvp2, mtx_light_1_mvp3) * p_w;
+    var_texcoord0_shadow[2] = get_shadow_mat(mtx_light_2_mvp0, mtx_light_2_mvp1, mtx_light_2_mvp2, mtx_light_2_mvp3) * p_w;
+    gl_Position             = mtx_proj * p;
+
+    var_position_clip = gl_Position;
 }
 

@@ -37,13 +37,6 @@ function init(self)
 	local proj_h = 150
 	local proj   = vmath.matrix4_orthographic(-proj_w/2, proj_w/2, -proj_h/2, proj_h/2, 0.1, 160)
 
-	-- If you want a perspective projection for the light, use something like this
-	-- Note: you need to adjust the bias value to match these settings.
-	-- self.light    = get_matrix_from_yaw_pitch_zoom(50,50,30)
-	-- local proj_w = 960
-	-- local proj_h = 640
-	-- local proj = vmath.matrix4_perspective(45, proj_w / proj_h, 0.1, 100)
-
 	msg.post(".", "acquire_input_focus")
 	msg.post("@render:", "set_light_projection", { projection = proj })
 	msg.post("@render:", "set_light_transform",  { transform  = self.light_transform, direction = self.light_vector })
