@@ -20,25 +20,21 @@ end
 function init(self)
 	self.view  = { x = 0, y = 0, w = 1, h = 1, transform = vmath.matrix4() }
 
-	self.yaw   = 90
-	self.pitch = 45
-	self.zoom  = 20
+	self.yaw   = 0
+	self.pitch = 0
+	self.zoom  = 30
 	self.time  = 0
 
 	self.light_yaw       = 45
 	self.light_pitch     = 45
 	self.light_zoom      = 0
-	self.light_rotation  = get_rotation_from_yaw_pitch(self.light_yaw,self.light_pitch)
-	self.light_vector    = vmath.normalize(vmath.rotate(self.light_rotation, vmath.vector3(0,0,1)))
+	self.light_rotation  = get_rotation_from_yaw_pitch(self.light_yaw, self.light_pitch)
+	self.light_vector    = vmath.vector3(0,0,-1) --vmath.normalize(vmath.rotate(self.light_rotation, vmath.vector3(0,0,1)))
 	self.light_transform = get_matrix_from_rot_zoom(self.light_rotation,self.light_zoom)
 
-	-- Use this for directional lights
-	local proj_w = 150
-	local proj_h = 150
-	local proj   = vmath.matrix4_orthographic(-proj_w/2, proj_w/2, -proj_h/2, proj_h/2, 0.1, 160)
+	self.light_transform = vmath.matrix4_look_at(vmath.vector3(), self.light_vector, vmath.vector3(0,1,0))
 
 	msg.post(".", "acquire_input_focus")
-	msg.post("@render:", "set_light_projection", { projection = proj })
 	msg.post("@render:", "set_light_transform",  { transform  = self.light_transform, direction = self.light_vector })
 	msg.post("@render:", "set_near_far",         { near = 0.1, far = 500 })
 end

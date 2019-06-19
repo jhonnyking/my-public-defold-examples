@@ -9,7 +9,7 @@ float rgba_to_float(vec4 rgba)
 void main()
 {
     vec4 color = texture2D(tex0, var_texcoord0.xy);
-    gl_FragColor = vec4(vec3(rgba_to_float(color)),1.0);
-    gl_FragColor = color;
+    gl_FragColor = vec4(vec3(rgba_to_float(color)) * 10.0,1.0);
+    // gl_FragColor = color;
 }
 

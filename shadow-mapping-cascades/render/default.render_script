@@ -56,14 +56,7 @@ function init(self)
     self.light_cascade_limits = {0,0,0,0}
 
     self.light_transform       = vmath.matrix4()
-    self.light_projection      = vmath.matrix4()
     self.light_constant_buffer = render.constant_buffer()
-
-    self.bias_matrix    = vmath.matrix4()
-    self.bias_matrix.c0 = vmath.vector4(0.5, 0.0, 0.0, 0.0)
-    self.bias_matrix.c1 = vmath.vector4(0.0, 0.5, 0.0, 0.0)
-    self.bias_matrix.c2 = vmath.vector4(0.0, 0.0, 0.5, 0.0)
-    self.bias_matrix.c3 = vmath.vector4(0.5, 0.5, 0.5, 1.0)
 end
 
 function render_view(self)    
@@ -105,17 +98,16 @@ function render_scene(self)
     local w         = render.get_window_width()
     local h         = render.get_window_height()
     local proj      = vmath.matrix4_perspective(self.fov, w/h, self.near, self.far)
-    local mtx_light = self.bias_matrix * self.light_projection * self.light_transform
     
     self.proj = proj
 
     for k, v in pairs(self.light_cascades) do
         local mtx_light = v.projection * self.light_transform
 
-        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv0"] = mtx_light.c0
-        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv1"] = mtx_light.c1
-        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv2"] = mtx_light.c2
-        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mpv3"] = mtx_light.c3
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp0"] = mtx_light.c0
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp1"] = mtx_light.c1
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp2"] = mtx_light.c2
+        self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp3"] = mtx_light.c3
     end
 
     self.light_constant_buffer.u_cascade_limits = vmath.vector4(
@@ -143,10 +135,13 @@ function render_scene(self)
 end
 
 function update_cascades(self)
-    local view_inv      =  vmath.inv(self.view.transform)
+    local view_inv      = vmath.matrix4(self.view.transform)
+    --local view_inv      = vmath.inv(self.view.transform)
     local aspect        = render.get_height() / render.get_width()
     local tan_half_hfov = math.tan(math.rad(self.fov / 2.0))
     local tan_half_vfov = math.tan(math.rad((self.fov * aspect) / 2.0))
+
+    local light_transform = self.light_transform
 
     for i = 1, #self.light_cascades do
         local xn = self.light_cascade_limits[i]     * tan_half_hfov
@@ -172,7 +167,7 @@ function update_cascades(self)
 
         for k, v in pairs(frustum_corners) do
             local vx_world = view_inv * v
-            local vx_light = self.light_transform * vx_world
+            local vx_light = light_transform * vx_world
             frustum_min.x  = math.min(frustum_min.x, vx_light.x)
             frustum_min.y  = math.min(frustum_min.y, vx_light.y)
             frustum_min.z  = math.min(frustum_min.z, vx_light.z)
@@ -182,7 +177,8 @@ function update_cascades(self)
             frustum_max.z  = math.max(frustum_max.z, vx_light.z)
         end
 
-        --pprint(frustum_min, frustum_max)
+        --pprint(frustum_min)
+        --pprint(frustum_max)
 
         self.light_cascades[i].projection = vmath.matrix4_orthographic(
             frustum_min.x, frustum_max.x,
@@ -212,6 +208,7 @@ function render_shadows(self)
     render.disable_state(render.STATE_CULL_FACE)
     render.set_view(self.light_transform)
 
+    --pprint("Update cascades")
     update_cascades(self)
 
     for k, v in pairs(self.light_cascades) do
@@ -253,9 +250,11 @@ end
 
 function calculate_cascade_limits(self)
     self.light_cascade_limits[1] = self.near
-    self.light_cascade_limits[2] = self.far / 10
-    self.light_cascade_limits[3] = self.far / 5
+    self.light_cascade_limits[2] = self.far / 20
+    self.light_cascade_limits[3] = self.far / 10
     self.light_cascade_limits[4] = self.far
+
+    pprint(self.light_cascade_limits)
 end
 
 function on_message(self, message_id, message)
@@ -264,8 +263,6 @@ function on_message(self, message_id, message)
     elseif message_id == hash("set_light_transform") then
         self.light_transform = message.transform
         self.light_direction = message.direction
-    elseif message_id == hash("set_light_projection") then
-        self.light_projection = message.projection
     elseif message_id == hash("set_view") then
         self.view = message
     elseif message_id == hash("set_near_far") then

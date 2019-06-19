@@ -46,6 +46,7 @@ float get_visibility(int cascade, vec3 depth_data)
 
 vec4 get_visibility(int cascade, vec4 light_space_pos)
 {
+    vec3 debug_color = vec3(0.0);
     vec3 proj_coord = light_space_pos.xyz / light_space_pos.w;
     vec2 uv_coord;
 
@@ -53,21 +54,32 @@ vec4 get_visibility(int cascade, vec4 light_space_pos)
     uv_coord.y = 0.5 * proj_coord.y + 0.5; 
     float z = 0.5 * proj_coord.z + 0.5; 
     
-    vec4 depth_sample = vec4(0.0);
+    vec4 csm_sample = vec4(0.0);
     if (cascade == 0)
-        depth_sample = texture2D(tex_csm_0, uv_coord.st);
+    {
+        csm_sample = texture2D(tex_csm_0, uv_coord.st);
+        debug_color = vec3(1.0,0.0,0.0);
+    }
     else if (cascade == 1)
-        depth_sample = texture2D(tex_csm_1, uv_coord.st);
+    {
+        csm_sample = texture2D(tex_csm_1, uv_coord.st);
+        debug_color = vec3(0.0,1.0,0.0);
+    }
     else if (cascade == 2)
-        depth_sample = texture2D(tex_csm_2, uv_coord.st);
+    {
+        csm_sample = texture2D(tex_csm_2, uv_coord.st);
+        debug_color = vec3(0.0,0.0,1.0);
+    }
 
-    return depth_sample;
-    /*
-    if (Depth < z + 0.00001) 
-        return 0.5;
+    float depth_sample = rgba_to_float(csm_sample);
+    float depth_bias = 0.002; // 0.00001
+
+    // return vec4(debug_color, 0.0);
+    
+    if (depth_sample < z + depth_bias)
+        return vec4(debug_color, 0.0);
     else 
-    return 1.0; 
-    */
+        return vec4(vec3(0.0), 1.0);
 }
 
 void main()
@@ -87,13 +99,14 @@ void main()
 
     for (int i=0; i < 3; i++)
     {
-        if (var_position_clip.z <= u_cascade_limits[i])
+        if (var_position_clip.z <= u_cascade_limits[i+1])
         {
             visibility = get_visibility(i, var_texcoord0_shadow[i]);
             break;
         }
     }
     
-    gl_FragColor = vec4(mix(color.rgb,visibility.rgb,0.5),1.0);
+    gl_FragColor.rgb = visibility.rgb; // mix(color.rgb, visibility.rgb, 1.0 - visibility.a);
+    gl_FragColor.a   = 1.0;
 }
 
