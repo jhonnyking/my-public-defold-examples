@@ -20,46 +20,124 @@ end
 function init(self)
 	self.view  = { x = 0, y = 0, w = 1, h = 1, transform = vmath.matrix4() }
 
-	self.yaw   = 0
+	self.yaw   = 90
 	self.pitch = 0
 	self.zoom  = 30
+
+	self.yaw_debug   = 0
+	self.pitch_debug = 0
+	self.zoom_debug  = 30
+		
 	self.time  = 0
 
-	self.light_yaw       = 45
-	self.light_pitch     = 45
-	self.light_zoom      = 0
-	self.light_rotation  = get_rotation_from_yaw_pitch(self.light_yaw, self.light_pitch)
-	self.light_vector    = vmath.vector3(0,0,-1) --vmath.normalize(vmath.rotate(self.light_rotation, vmath.vector3(0,0,1)))
-	self.light_transform = get_matrix_from_rot_zoom(self.light_rotation,self.light_zoom)
+	self.camera = 1
+	self.light_vector    = vmath.vector3(0,0,1)
 
 	self.light_transform = vmath.matrix4_look_at(vmath.vector3(), self.light_vector, vmath.vector3(0,1,0))
+
+	self.view.transform_debug = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw_debug,self.pitch_debug), self.zoom_debug)
+	self.view.transform       = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
 
 	msg.post(".", "acquire_input_focus")
 	msg.post("@render:", "set_light_transform",  { transform  = self.light_transform, direction = self.light_vector })
 	msg.post("@render:", "set_near_far",         { near = 0.1, far = 200 })
+	msg.post("@render:", "set_view", self.view)
 end
 
 function update(self, dt)
 	self.time = self.time + dt
 	
 	-- Update camera
-	self.view.transform = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
+	if self.camera == 1 then
+		self.view.transform_debug = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw_debug,self.pitch_debug), self.zoom_debug)
+	else
+		self.view.transform = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
+	end
+	
 	msg.post("@render:", "set_view", self.view)
 
 	-- Update scene
 	local pos        = go.get_position("/shadow_sphere")
-	local pos_offset = 5
+	local pos_offset = 10
 	pos.x = math.sin(self.time) * pos_offset
 	pos.z = math.cos(self.time) * pos_offset
 	go.set_position(pos,"/shadow_sphere")
+
+	if self.frustum_debug then
+		if not self.did_create_spheres then
+			self.did_create_spheres = 1
+			self.frustum_spheres = {}
+
+			for i = 1, #self.frustum_debug.points do
+				for j = 1, 8 do
+					table.insert(self.frustum_spheres, factory.create("/factories#frustum_sphere"))
+				end
+			end
+
+			for i = 1, #self.frustum_debug.positions do
+				table.insert(self.frustum_spheres, factory.create("/factories#frustum_cube"))
+			end
+		end
+
+		-- debug
+		local sphere_i = 1
+		for _, v in pairs(self.frustum_debug.points) do
+			for _, p in pairs(v) do
+				go.set_position(vmath.vector3(p.x,p.y,p.z), self.frustum_spheres[sphere_i])
+				sphere_i = sphere_i + 1
+			end
+		end
+
+		for _, p in pairs(self.frustum_debug.positions) do
+			local fp = vmath.vector3(p.x,p.y,p.z)
+			go.set_position(fp, self.frustum_spheres[sphere_i])
+			sphere_i = sphere_i + 1
+		end
+
+		local debug_colors = {
+			vmath.vector4(1,0,0,1),
+			vmath.vector4(0,1,0,1),
+			vmath.vector4(0,0,1,1)
+		}
+
+		--[[
+		for k, p in pairs(self.frustum_debug.dirs) do
+			local fp = self.frustum_debug.positions[k]
+			local s = vmath.vector3(fp.x,fp.y,fp.z)
+			local e = vmath.vector3(p.x, p.y, p.z)
+			local c = debug_colors[k]
+			
+			msg.post("@render:", "draw_line", {start_point = s, end_point = e, color = c})
+		end
+		]]
+	end
 end
 
 function on_input(self, action_id, action)
 	if action_id == hash("M_LEFT") then
 		self.did_input = true
-		self.yaw       = self.yaw + action.dx
-		self.pitch     = self.pitch - action.dy
+		if self.camera == 1 then
+			self.yaw_debug = self.yaw_debug + action.dx
+			self.pitch_debug = self.pitch_debug - action.dy
+		else
+			self.yaw = self.yaw + action.dx
+			self.pitch = self.pitch - action.dy
+		end
 	elseif action_id == hash("M_RIGHT") then
-		self.zoom      = self.zoom + action.dy * 0.1
+		if self.camera == 1 then
+			self.zoom_debug = self.zoom_debug + action.dy * 0.1
+		else
+			self.zoom = self.zoom + action.dy * 0.1
+		end
+	elseif action_id == hash("M_CHANGE_CAMERA") and action.pressed then
+		self.camera = -self.camera
+
+		msg.post("@render:", "set_camera_id", { camera = self.camera })
+	end
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("frustum_debug") then
+		self.frustum_debug = message
 	end
 end

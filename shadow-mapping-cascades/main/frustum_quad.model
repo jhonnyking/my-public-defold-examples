@@ -1,0 +1,6 @@
+mesh: "/assets/models/cube_mesh.dae"
+material: "/assets/materials/unlit.material"
+skeleton: ""
+animations: ""
+default_animation: ""
+name: "unnamed"

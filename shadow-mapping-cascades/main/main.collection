@@ -39,14 +39,6 @@ embedded_instances {
   id: "shadow_group"
   children: "shadow_gui"
   children: "shadow_model"
-  children: "shadow_model1"
-  children: "shadow_model2"
-  children: "shadow_model3"
-  children: "shadow_model4"
-  children: "shadow_model5"
-  children: "shadow_model6"
-  children: "shadow_model7"
-  children: "shadow_model8"
   children: "shadow_overlay"
   children: "shadow_sphere"
   data: ""
@@ -72,7 +64,7 @@ embedded_instances {
   data: "embedded_components {\n"
   "  id: \"model\"\n"
   "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
+  "  data: \"mesh: \\\"/assets/models/dragon.dae\\\"\\n"
   "material: \\\"/assets/materials/diffuse.material\\\"\\n"
   "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
   "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
@@ -234,34 +226,10 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "shadow_model1"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
+  id: "debug"
+  data: ""
   position {
-    x: -20.0
+    x: 0.0
     y: 0.0
     z: 0.0
   }
@@ -278,18 +246,12 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "shadow_model2"
+  id: "factories"
   data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
+  "  id: \"frustum_sphere\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/frustum_sphere.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -303,37 +265,11 @@ embedded_instances {
   "    w: 1.0\n"
   "  }\n"
   "}\n"
-  ""
-  position {
-    x: 20.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model3"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
+  "embedded_components {\n"
+  "  id: \"frustum_cube\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/frustum_cube.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -351,227 +287,7 @@ embedded_instances {
   position {
     x: 0.0
     y: 0.0
-    z: 20.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
     z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model4"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: -20.0
-    y: 0.0
-    z: 20.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model5"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: 20.0
-    y: 0.0
-    z: 20.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model6"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: 0.0
-    y: 0.0
-    z: -20.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model7"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: -20.0
-    y: 0.0
-    z: -20.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "shadow_model8"
-  data: "embedded_components {\n"
-  "  id: \"model\"\n"
-  "  type: \"model\"\n"
-  "  data: \"mesh: \\\"/assets/models/shadow_test_mesh.dae\\\"\\n"
-  "material: \\\"/assets/materials/diffuse.material\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "textures: \\\"/assets/textures/concrete.jpg\\\"\\n"
-  "skeleton: \\\"\\\"\\n"
-  "animations: \\\"\\\"\\n"
-  "default_animation: \\\"\\\"\\n"
-  "name: \\\"unnamed\\\"\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: 20.0
-    y: 0.0
-    z: -20.0
   }
   rotation {
     x: 0.0

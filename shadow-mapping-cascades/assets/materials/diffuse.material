@@ -183,6 +183,46 @@ vertex_constants {
     w: 0.0
   }
 }
+vertex_constants {
+  name: "camera_mvp_mvp0"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+vertex_constants {
+  name: "camera_mvp_mvp1"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+vertex_constants {
+  name: "camera_mvp_mvp2"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+vertex_constants {
+  name: "camera_mvp_mvp3"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
 fragment_constants {
   name: "u_cascade_limits"
   type: CONSTANT_TYPE_USER

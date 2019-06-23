@@ -12,7 +12,7 @@ void main()
     float depth = color.r; // vec3(rgba_to_float(color));
     
     gl_FragColor.a = 1.0;
-    gl_FragColor.r = depth;
+    gl_FragColor.rgb = vec3(1.0-depth);
     //gl_FragColor.rg = color.gb;
     // gl_FragColor.rgb = vec3(color.a);
 }

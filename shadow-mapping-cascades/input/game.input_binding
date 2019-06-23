@@ -1,3 +1,7 @@
+key_trigger {
+  input: KEY_SPACE
+  action: "M_CHANGE_CAMERA"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "M_LEFT"

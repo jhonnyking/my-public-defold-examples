@@ -81,8 +81,10 @@ void main()
         }
     }
     
-    gl_FragColor.rgb = mix(color.rgb, visibility.rgb, visibility.a);
+    // gl_FragColor.rgb = mix(color.rgb, visibility.rgb, visibility.a);
     gl_FragColor.rgb = mix(visibility.rgb * 0.5,visibility.rgb,visibility.a) + color.rgb * 0.0001;
+
+    //gl_FragColor.rgb = visibility.rgb + color.rgb * 0.0001;
     gl_FragColor.a   = 1.0;
 }
 

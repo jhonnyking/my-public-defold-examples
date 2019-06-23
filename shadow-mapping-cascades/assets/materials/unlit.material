@@ -1,5 +1,5 @@
 name: "model"
-tags: "model"
+tags: "frustum_debug_pred"
 vertex_program: "/assets/materials/standard.vp"
 fragment_program: "/assets/materials/unlit.fp"
 vertex_space: VERTEX_SPACE_WORLD
