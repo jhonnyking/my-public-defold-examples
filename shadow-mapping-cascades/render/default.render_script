@@ -1,6 +1,6 @@
 local function create_depth_buffer(w,h)
     local color_params = {
-        format     = render.FORMAT_RGBA,
+        format     = 20, -- render.FORMAT_RGBA,
         width      = w,
         height     = h,
         min_filter = render.FILTER_NEAREST,
@@ -48,15 +48,29 @@ function init(self)
     self.fov  = 45
     self.proj = vmath.matrix4()
 
-    local cascade_size     = 1024
-    self.light_cascades    = {}
-    self.light_cascades[1] = create_cascade(cascade_size, vmath.vector4(1,0,0,1))
-    self.light_cascades[2] = create_cascade(cascade_size, vmath.vector4(0,1,0,1))
-    self.light_cascades[3] = create_cascade(cascade_size, vmath.vector4(0,0,1,1))
-    self.light_cascade_limits = {0,0,0,0}
+    self.bias_matrix    = vmath.matrix4()
+    self.bias_matrix.c0 = vmath.vector4(0.5, 0.0, 0.0, 0.0)
+    self.bias_matrix.c1 = vmath.vector4(0.0, 0.5, 0.0, 0.0)
+    self.bias_matrix.c2 = vmath.vector4(0.0, 0.0, 0.5, 0.0)
+    self.bias_matrix.c3 = vmath.vector4(0.5, 0.5, 0.5, 1.0)
 
-    self.light_transform       = vmath.matrix4()
-    self.light_constant_buffer = render.constant_buffer()
+    local cascade_size     = 1024
+    local num_cascades     = 3
+    local debug_colors     = {
+        vmath.vector4(1,0,0,1),
+        vmath.vector4(0,1,0,1),
+        vmath.vector4(0,0,1,1)}
+    
+    self.light_cascades       = {}
+    self.light_cascade_limits = {0,0,0,0}
+    
+    for i = 1, num_cascades do
+        table.insert(self.light_cascades, create_cascade(cascade_size, debug_colors[i]))
+    end
+
+    self.light_transform                        = vmath.matrix4()
+    self.light_constant_buffer                  = render.constant_buffer()
+    self.light_constant_buffer.u_cascade_limits = vmath.vector4()
 end
 
 function render_view(self)    
@@ -65,6 +79,9 @@ function render_view(self)
     
     render.set_viewport(self.view.x * w, self.view.y * h, self.view.w * w, self.view.h * h)
     render.set_view(self.view.transform)
+
+    --render.set_projection(self.light_cascades[1].projection)
+    --render.set_view(self.light_transform)
 
     for k, v in pairs(self.light_cascades) do
         render.enable_texture(k, v.buffer, render.BUFFER_COLOR_BIT)
@@ -97,12 +114,12 @@ end
 function render_scene(self)
     local w         = render.get_window_width()
     local h         = render.get_window_height()
-    local proj      = vmath.matrix4_perspective(self.fov, w/h, self.near, self.far)
+    local proj      = vmath.matrix4_perspective(math.rad(self.fov), w/h, self.near, self.far)
     
     self.proj = proj
 
     for k, v in pairs(self.light_cascades) do
-        local mtx_light = v.projection * self.light_transform
+        local mtx_light = self.bias_matrix * v.projection * self.light_transform
 
         self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp0"] = mtx_light.c0
         self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp1"] = mtx_light.c1
@@ -110,17 +127,26 @@ function render_scene(self)
         self.light_constant_buffer["mtx_light_" .. (k-1) .. "_mvp3"] = mtx_light.c3
     end
 
+    local normalized_cascade_limits = {}
+    
+    for k, v in pairs({"x","y","z"}) do
+        local limit = self.proj * vmath.vector4(0,0,self.light_cascade_limits[k+1],1)
+        normalized_cascade_limits[k] = self.light_cascade_limits[k+1] -- -limit.z
+    end
+
     self.light_constant_buffer.u_cascade_limits = vmath.vector4(
-        self.light_cascade_limits[1],
-        self.light_cascade_limits[2],
-        self.light_cascade_limits[3],
-        self.light_cascade_limits[4])
+        normalized_cascade_limits[1],
+        normalized_cascade_limits[2],
+        normalized_cascade_limits[3],
+        0)
+
+    -- pprint(self.light_constant_buffer.u_cascade_limits)
 
     render.set_projection(self.proj)
     render.set_color_mask(true, true, true, true)
     render.set_depth_mask(true)
     render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
-
+    
     render.enable_state(render.STATE_DEPTH_TEST)
     render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
     render.disable_state(render.STATE_STENCIL_TEST)
@@ -128,7 +154,7 @@ function render_scene(self)
     render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
 
     --render.enable_state(render.STATE_CULL_FACE)
-    render.set_cull_face(render.FACE_BACK)
+    -- render.set_cull_face(render.FACE_BACK)
     --render.disable_state(render.STATE_CULL_FACE)
 
     render_view(self)
@@ -136,12 +162,11 @@ end
 
 function update_cascades(self)
     local view_inv      = vmath.matrix4(self.view.transform)
-    --local view_inv      = vmath.inv(self.view.transform)
     local aspect        = render.get_height() / render.get_width()
-    local tan_half_hfov = math.tan(math.rad(self.fov / 2.0))
-    local tan_half_vfov = math.tan(math.rad((self.fov * aspect) / 2.0))
+    local tan_half_hfov = math.tan(math.rad(self.fov))
+    local tan_half_vfov = math.tan(math.rad((self.fov * aspect)))
 
-    local light_transform = self.light_transform
+    local light_transform = vmath.inv(self.light_transform)
 
     for i = 1, #self.light_cascades do
         local xn = self.light_cascade_limits[i]     * tan_half_hfov
@@ -179,6 +204,7 @@ function update_cascades(self)
 
         --pprint(frustum_min)
         --pprint(frustum_max)
+        --pprint(frustum_min.z, frustum_max.z)
 
         self.light_cascades[i].projection = vmath.matrix4_orthographic(
             frustum_min.x, frustum_max.x,
@@ -195,7 +221,7 @@ function render_cascade(self, c)
     render.set_viewport(0, 0, w, h)
 
     render.set_render_target(c.buffer, { transient = {render.BUFFER_DEPTH_BIT} })
-    render.clear({[render.BUFFER_COLOR_BIT] = vmath.vector4(0,0,0,1), [render.BUFFER_DEPTH_BIT] = 1})
+    render.clear({[render.BUFFER_COLOR_BIT] = vmath.vector4(1,0,0,1), [render.BUFFER_DEPTH_BIT] = 1})
     render.draw(self.model_pred, c.constants)
 end
 
@@ -208,7 +234,6 @@ function render_shadows(self)
     render.disable_state(render.STATE_CULL_FACE)
     render.set_view(self.light_transform)
 
-    --pprint("Update cascades")
     update_cascades(self)
 
     for k, v in pairs(self.light_cascades) do
@@ -249,10 +274,23 @@ function update(self)
 end
 
 function calculate_cascade_limits(self)
-    self.light_cascade_limits[1] = self.near
-    self.light_cascade_limits[2] = self.far / 20
-    self.light_cascade_limits[3] = self.far / 10
-    self.light_cascade_limits[4] = self.far
+    local num_cascades = #self.light_cascades
+    local diff         = self.far - self.near
+
+    self.light_cascade_limits = { self.near }
+
+    local values = { self.far / 10, self.far / 5 }
+    
+    for i = 1, (num_cascades-1) do
+        -- table.insert(self.light_cascade_limits, math.pow(i / num_cascades, 3) * diff)
+        table.insert(self.light_cascade_limits, values[i])
+    end
+
+    table.insert(self.light_cascade_limits, self.far)
+
+    for i = 1, (4 - #self.light_cascade_limits) do
+        table.insert(self.light_cascade_limits, 0)
+    end
 
     pprint(self.light_cascade_limits)
 end
@@ -261,10 +299,13 @@ function on_message(self, message_id, message)
     if message_id == hash("clear_color") then
         self.clear_color = message.color
     elseif message_id == hash("set_light_transform") then
-        self.light_transform = message.transform
+        -- self.light_transform = message.transform
         self.light_direction = message.direction
+        self.light_transform = vmath.matrix4_look_at(vmath.vector3(), message.direction, vmath.vector3(0,1,0))
+        
     elseif message_id == hash("set_view") then
         self.view = message
+        -- pprint(self.view.transform)
     elseif message_id == hash("set_near_far") then
         self.near = message.near
         self.far = message.far

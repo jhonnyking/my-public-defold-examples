@@ -12,37 +12,12 @@ uniform lowp sampler2D tex_csm_2;
 
 uniform mediump vec4 u_cascade_limits;
 
+const int NUM_CASCADES = 3;
+
 float rgba_to_float(vec4 rgba)
 {
     return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
 }
-
-/*
-float get_visibility(int cascade, vec3 depth_data)
-{
-    vec4 depth_sample = vec4(0.0);
-
-    if (cascade == 0)
-        depth_sample = texture2D(tex_csm_0, depth_data.st);
-    else if (cascade == 1)
-        depth_sample = texture2D(tex_csm_1, depth_data.st);
-    else if (cascade == 2)
-        depth_sample = texture2D(tex_csm_2, depth_data.st);
-    
-    float depth            = rgba_to_float(depth_sample);
-    const float depth_bias = 0.002;
-    // const float depth_bias = 0.00002; // for perspective camera
-
-    // The 'depth_bias' value is per-scene dependant and must be tweaked accordingly.
-    // It is needed to avoid shadow acne, which is basically a precision issue.
-    if (depth < depth_data.z - depth_bias)
-    {
-        return 0.5;
-    }
-
-    return 1.0;
-}
-*/
 
 vec4 get_visibility(int cascade, vec4 light_space_pos)
 {
@@ -50,36 +25,36 @@ vec4 get_visibility(int cascade, vec4 light_space_pos)
     vec3 proj_coord = light_space_pos.xyz / light_space_pos.w;
     vec2 uv_coord;
 
+    /*
     uv_coord.x = 0.5 * proj_coord.x + 0.5; 
     uv_coord.y = 0.5 * proj_coord.y + 0.5; 
     float z = 0.5 * proj_coord.z + 0.5; 
+    */
     
     vec4 csm_sample = vec4(0.0);
     if (cascade == 0)
     {
-        csm_sample = texture2D(tex_csm_0, uv_coord.st);
+        csm_sample = texture2D(tex_csm_0, proj_coord.st);
         debug_color = vec3(1.0,0.0,0.0);
     }
     else if (cascade == 1)
     {
-        csm_sample = texture2D(tex_csm_1, uv_coord.st);
+        csm_sample = texture2D(tex_csm_1, proj_coord.st);
         debug_color = vec3(0.0,1.0,0.0);
     }
     else if (cascade == 2)
     {
-        csm_sample = texture2D(tex_csm_2, uv_coord.st);
+        csm_sample = texture2D(tex_csm_2, proj_coord.st);
         debug_color = vec3(0.0,0.0,1.0);
     }
 
-    float depth_sample = rgba_to_float(csm_sample);
-    float depth_bias = 0.002; // 0.00001
-
-    // return vec4(debug_color, 0.0);
+    float depth_sample = csm_sample.r; // rgba_to_float(csm_sample);
+    float depth_bias = 0.01; // 0.00001
     
-    if (depth_sample < z + depth_bias)
+    if (depth_sample < proj_coord.z - depth_bias)
         return vec4(debug_color, 0.0);
     else 
-        return vec4(vec3(0.0), 1.0);
+        return vec4(debug_color, 1.0);
 }
 
 void main()
@@ -97,16 +72,17 @@ void main()
 
     vec4 visibility = vec4(0.0);
 
-    for (int i=0; i < 3; i++)
+    for (int i=0; i < NUM_CASCADES; i++)
     {
-        if (var_position_clip.z <= u_cascade_limits[i+1])
+        if (var_position_clip.z <= u_cascade_limits[i])
         {
             visibility = get_visibility(i, var_texcoord0_shadow[i]);
             break;
         }
     }
     
-    gl_FragColor.rgb = visibility.rgb; // mix(color.rgb, visibility.rgb, 1.0 - visibility.a);
+    gl_FragColor.rgb = mix(color.rgb, visibility.rgb, visibility.a);
+    gl_FragColor.rgb = mix(visibility.rgb * 0.5,visibility.rgb,visibility.a) + color.rgb * 0.0001;
     gl_FragColor.a   = 1.0;
 }
 

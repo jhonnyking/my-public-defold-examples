@@ -13,7 +13,7 @@ samples = 4
 update_frequency = 0
 
 [project]
-title = shadow-mapping-example
+title = shadow-mapping-cascades-example
 
 [graphics]
 default_texture_min_filter = nearest
