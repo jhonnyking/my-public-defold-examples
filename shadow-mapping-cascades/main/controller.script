@@ -80,11 +80,35 @@ function update(self, dt)
 		end
 
 		-- debug
+		local debug_colors = {
+			vmath.vector4(1,0,0,1),
+			vmath.vector4(0,1,0,1),
+			vmath.vector4(0,0,1,1)
+		}
 		local sphere_i = 1
-		for _, v in pairs(self.frustum_debug.points) do
-			for _, p in pairs(v) do
-				go.set_position(vmath.vector3(p.x,p.y,p.z), self.frustum_spheres[sphere_i])
+		for f, v in pairs(self.frustum_debug.points) do
+			local line_start = {}
+			for c, p in pairs(v) do
+				local p_set = vmath.vector3(p.x,p.y,p.z)
+				go.set_position(p_set, self.frustum_spheres[sphere_i])
 				sphere_i = sphere_i + 1
+
+				if c < 5 then
+					line_start[c] = p_set
+				else
+					msg.post("@render:", "draw_line", {start_point = line_start[c-4], end_point = p_set, color = debug_colors[f]})
+
+					local p_0 = p_set
+					local p_1 = nil
+					
+					if c < 8 then
+						p_1 = vmath.vector3(v[c+1].x,v[c+1].y,v[c+1].z)
+					else
+						p_1 = vmath.vector3(v[5].x,v[5].y,v[5].z)
+					end
+					
+					msg.post("@render:", "draw_line", {start_point = p_0, end_point = p_1, color = debug_colors[f]})
+				end 
 			end
 		end
 
@@ -93,12 +117,6 @@ function update(self, dt)
 			go.set_position(fp, self.frustum_spheres[sphere_i])
 			sphere_i = sphere_i + 1
 		end
-
-		local debug_colors = {
-			vmath.vector4(1,0,0,1),
-			vmath.vector4(0,1,0,1),
-			vmath.vector4(0,0,1,1)
-		}
 
 		--[[
 		for k, p in pairs(self.frustum_debug.dirs) do
