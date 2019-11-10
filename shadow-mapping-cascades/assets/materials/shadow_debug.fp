@@ -8,12 +8,9 @@ float rgba_to_float(vec4 rgba)
 
 void main()
 {
-    vec4 color  = texture2D(tex0, var_texcoord0.xy);
-    float depth = color.r; // vec3(rgba_to_float(color));
-    
-    gl_FragColor.a = 1.0;
+    vec4 color       = texture2D(tex0, var_texcoord0.xy);
+    float depth      = color.r; // vec3(rgba_to_float(color));
+    gl_FragColor.a   = 1.0;
     gl_FragColor.rgb = vec3(1.0-depth);
-    //gl_FragColor.rg = color.gb;
-    // gl_FragColor.rgb = vec3(color.a);
 }
 

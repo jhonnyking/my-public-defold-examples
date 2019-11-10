@@ -26,9 +26,15 @@ local function get_frustum_points(inv_mvp)
 	-- NDC coordinates
 	local points = {
 		-- near points
-		vmath.vector4(-1,-1,-1,1),vmath.vector4(1,-1,-1,1),vmath.vector4(1,1,-1,1),vmath.vector4(-1,1,-1,1),
+		vmath.vector4(-1, 1,-1,1),
+		vmath.vector4( 1, 1,-1,1),
+		vmath.vector4( 1,-1,-1,1),
+		vmath.vector4(-1,-1,-1,1),
 		-- far points
-		vmath.vector4(-1,-1,1,1),vmath.vector4(1,-1,1,1),vmath.vector4(1,1,1,1),vmath.vector4(-1,1,1,1),
+		vmath.vector4(-1, 1, 1,1),
+		vmath.vector4( 1, 1, 1,1),
+		vmath.vector4( 1,-1, 1,1),
+		vmath.vector4(-1,-1, 1,1),
 	}
 
 	for k, v in pairs(points) do
@@ -45,127 +51,64 @@ local function get_frustum_points(inv_mvp)
 	return points
 end
 
-local function get_ortho_planes(frustum_points, inv_light_matrix)
-	local max_v =  1e10
-	local min_x =  max_v
-	local max_x = -max_v
-	local min_y =  max_v
-	local max_y = -max_v
-	local min_z =  max_v
-	local max_z = -max_v
-
-	for k, v in pairs(frustum_points) do
-		local p = inv_light_matrix * v
-		min_x   = math.min(min_x, p.x)
-		min_y   = math.min(min_y, p.y)
-		min_z   = math.min(min_z, p.z)
-		max_x   = math.max(max_x, p.x)
-		max_y   = math.max(max_y, p.y)
-		max_z   = math.max(max_z, p.z)
-	end
-
-	return { l = min_x, r = max_x, b = min_y, t = max_y, n = min_z, f = max_z }
+local function tov3(v4)
+	return vmath.vector3(v4.x,v4.y,v4.z)
 end
 
-local M = {}
+local function tov4(v3)
+	return vmath.vector4(v3.x,v3.y,v3.z,1.0)
+end
 
 local function M_update(self, camera, camera_view, light_direction)
-	local aspect = camera.width / camera.height
-	local limits = {camera.near, camera.far / 10, camera.far / 5, camera.far}
-	local tan_half_hfov = math.tan(camera.fov)
-	local tan_half_vfov = math.tan(camera.fov * aspect)
-	local inv_view = vmath.inv(camera_view)
 
-	--[[
-	for k, v in pairs(self.data) do
-		local xn = limits[k]     * tan_half_hfov
-		local xf = limits[k + 1] * tan_half_hfov
-		local yn = limits[k]     * tan_half_vfov
-		local yf = limits[k + 1] * tan_half_vfov
-
-		local frustum_corners = {
-			vmath.vector4( xn,  yn, limits[k], 1.0),
-			vmath.vector4(-xn,  yn, limits[k], 1.0),
-			vmath.vector4( xn, -yn, limits[k], 1.0),
-			vmath.vector4(-xn, -yn, limits[k], 1.0),
-
-			vmath.vector4( xf,  yf, limits[k + 1], 1.0),
-			vmath.vector4(-xf,  yf, limits[k + 1], 1.0),
-			vmath.vector4( xf, -yf, limits[k + 1], 1.0),
-			vmath.vector4(-xf, -yf, limits[k + 1], 1.0),
-		}
-
-		local z_min = 1e10
-		local z_max = -z_min
-
-		local frustum_center  = vmath.vector4()
-
-		for k,v in pairs(frustum_corners) do
-			local vx_world = inv_view * v
-			frustum_corners[k] = vx_world
-
-			frustum_center = frustum_center + vx_world
-			z_min          = math.min(z_min, vx_world.z)
-			z_max          = math.max(z_max, vx_world.z)
-		end
-
-		frustum_center  = frustum_center * (1/8)
-
-		local lpos_dist = z_max - z_min
-		local lpos_dir  = vmath.vector4(light_direction.x,light_direction.y,light_direction.z,0) * lpos_dist
-		local lpos      = frustum_center + lpos_dir
-
-		local langle_x = math.acos(light_direction.z)
-		local langle_y = math.asin(light_direction.x)
-		local view_inv = vmath.matrix4_rotation_y(langle_y) * vmath.matrix4_rotation_x(langle_x)
-		view_inv.m03   = -lpos.x
-		view_inv.m13   = -lpos.y
-		view_inv.m23   = -lpos.z
-
-		v.view       = vmath.inv(view_inv)
-		v.projection = get_ortho_matrix(frustum_corners, view_inv)
-		v.frustum_points = frustum_corners
-		v.frustum_center = frustum_center
-	end
-	--]]
+	local aspect         = camera.width / camera.height
+	local limits         = {0, 0.3, 0.65, 1.0}
+	local frustum_proj   = vmath.matrix4_perspective(camera.fov, aspect, camera.near, camera.far)
+	local camera_inv_mvp = vmath.inv(frustum_proj * camera_view)
 
 	for k, v in pairs(self.data) do
-		local frustum_proj    = vmath.matrix4_perspective(camera.fov, aspect, v.near, v.far)
-		local frustum_inv_mvp = vmath.inv(frustum_proj * inv_view)
-		
-		local frustum_center  = vmath.vector4()
-		local frustum_points  = get_frustum_points(frustum_inv_mvp)
+		local split_distance_prev = limits[k]
+		local split_distance      = limits[k+1]
+		local frustum_points_wp   = get_frustum_points(camera_inv_mvp)
 
-		local z_min = 1e10
-		local z_max = -z_min
-
-		for _, p in pairs(frustum_points) do
-			frustum_center = frustum_center + p
-			z_min          = math.min(z_min, p.z)
-			z_max          = math.max(z_max, p.z)
+		for i = 1, 4 do
+			local ray_corner         = frustum_points_wp[i + 4] - frustum_points_wp[i]
+			local ray_corner_near    = ray_corner * split_distance_prev
+			local ray_corner_far     = ray_corner * split_distance
+			frustum_points_wp[i + 4] = frustum_points_wp[i] + ray_corner_far;
+			frustum_points_wp[i]     = frustum_points_wp[i] + ray_corner_near;
 		end
 
-		frustum_center  = frustum_center * (1/8)
-		local lpos_dist = z_max - z_min
-		local lpos_dir  = vmath.vector4(light_direction.x,light_direction.y,light_direction.z,0) * lpos_dist
-		local lpos      = frustum_center + lpos_dir
-		
-		local langle_x = math.acos(light_direction.z)
-		local langle_y = math.asin(light_direction.x)
-		local view_inv = vmath.matrix4_rotation_y(langle_y) * vmath.matrix4_rotation_x(langle_x)
-		view_inv.m03   = -lpos.x
-		view_inv.m13   = -lpos.y
-		view_inv.m23   = -lpos.z
+		local frustum_center = vmath.vector4()
+		for i = 1, 8 do
+			frustum_center = frustum_center + frustum_points_wp[i]
+		end
+		frustum_center = frustum_center * (1/8)
 
-		local planes = get_ortho_planes(frustum_points, view_inv)
+		local far  = -1e10
+		local near = 1e1
 
-		v.projection_planes = planes
-		v.view              = vmath.inv(view_inv)
-		v.projection        = vmath.matrix4_orthographic(planes.l, planes.r, planes.b, planes.t, planes.n, planes.f)
-		v.frustum_points    = frustum_points
-		v.frustum_center    = frustum_center
-		v.frustum_position  = lpos
-		v.frustum_dir       = lpos_dir
+		local radius = 0
+		for i = 1, 8 do
+			local dist = vmath.length(frustum_points_wp[i] - frustum_center)
+			radius     = math.max(radius, dist)
+		end
+
+		local extents_max = vmath.vector3(radius, radius, radius)
+		local extents_min = extents_max * -1
+		v.frustum_points  = frustum_points_wp
+		v.frustum_center  = frustum_center
+
+		local light_dir          = frustum_center - vmath.normalize(tov4(light_direction)) * -extents_min.z
+		local light_view_matrix  = vmath.matrix4_look_at(tov3(light_dir), tov3(frustum_center), vmath.vector3(0,1,0))
+		local cascade_extents    = extents_max - extents_min
+		local light_ortho_matrix = vmath.matrix4_orthographic(extents_min.x, extents_max.x, extents_min.y, extents_max.y, 0, cascade_extents.z)
+
+		v.view       = light_view_matrix
+		v.projection = light_ortho_matrix
+
+		local clip_dist = camera.far - camera.near
+		self.limits[k]  = (camera.near + split_distance * clip_dist) * 1;
 	end
 end
 
@@ -210,9 +153,15 @@ local function M_get_frustum_dir(self,c)
 	return self.data[c].frustum_dir
 end
 
+local function M_get_cascade_limits(self)
+	return self.limits
+end
+
+local M = {}
 M.create = function(num_cascades, texture_size)
 	local C = {
 		data                   = {},
+		limits                 = {},
 		update                 = M_update,
 		set_near_far           = M_set_near_far,
 		get_buffer             = M_get_buffer,
@@ -223,7 +172,8 @@ M.create = function(num_cascades, texture_size)
 		get_frustum_centers    = M_get_frustum_center,
 		get_frustum_position   = M_get_frustum_positions,
 		get_frustum_planes     = M_get_frustum_planes,
-		get_frustum_directions = M_get_frustum_dir
+		get_frustum_directions = M_get_frustum_dir,
+		get_cascade_limits     = M_get_cascade_limits
 	}
 
 	for i = 1, num_cascades do

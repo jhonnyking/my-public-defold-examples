@@ -11,5 +11,4 @@ vec4 float_to_rgba( float v )
 void main()
 {
 	gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.st / 1024.0, 1.0); // float_to_rgba(gl_FragCoord.z);
-	// gl_FragColor = u_color;
 }

@@ -27,42 +27,25 @@ function init(self)
 	self.yaw_debug   = 0
 	self.pitch_debug = 0
 	self.zoom_debug  = 30
+
+	self.yaw_light   = -30
+	self.pitch_light = 60
 		
 	self.time  = 0
 
-	self.camera = 1
-	self.light_vector    = vmath.vector3(0,0,1)
-
-	self.light_transform = vmath.matrix4_look_at(vmath.vector3(), self.light_vector, vmath.vector3(0,1,0))
-
+	self.camera = -1
+	self.light_vector         = get_rotation_from_yaw_pitch(self.yaw_light, self.pitch_light)
 	self.view.transform_debug = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw_debug,self.pitch_debug), self.zoom_debug)
 	self.view.transform       = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
 
 	msg.post(".", "acquire_input_focus")
-	msg.post("@render:", "set_light_transform",  { transform  = self.light_transform, direction = self.light_vector })
-	msg.post("@render:", "set_near_far",         { near = 0.1, far = 200 })
-	msg.post("@render:", "set_view", self.view)
+	msg.post("@render:", "set_light_direction",  { direction = self.light_vector })
+	msg.post("@render:", "set_near_far",         { near = 0.1, far = 150 })
+	msg.post("@render:", "set_camera_id",        { camera = self.camera })
+	msg.post("@render:", "set_view",               self.view)
 end
 
-function update(self, dt)
-	self.time = self.time + dt
-	
-	-- Update camera
-	if self.camera == 1 then
-		self.view.transform_debug = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw_debug,self.pitch_debug), self.zoom_debug)
-	else
-		self.view.transform = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
-	end
-	
-	msg.post("@render:", "set_view", self.view)
-
-	-- Update scene
-	local pos        = go.get_position("/shadow_sphere")
-	local pos_offset = 10
-	pos.x = math.sin(self.time) * pos_offset
-	pos.z = math.cos(self.time) * pos_offset
-	go.set_position(pos,"/shadow_sphere")
-
+function update_debug(self)
 	if self.frustum_debug then
 		if not self.did_create_spheres then
 			self.did_create_spheres = 1
@@ -75,6 +58,10 @@ function update(self, dt)
 			end
 
 			for i = 1, #self.frustum_debug.positions do
+				table.insert(self.frustum_spheres, factory.create("/factories#frustum_cube"))
+			end
+
+			for i = 1, #self.frustum_debug.centers do
 				table.insert(self.frustum_spheres, factory.create("/factories#frustum_cube"))
 			end
 		end
@@ -100,40 +87,59 @@ function update(self, dt)
 
 					local p_0 = p_set
 					local p_1 = nil
-					
+
 					if c < 8 then
 						p_1 = vmath.vector3(v[c+1].x,v[c+1].y,v[c+1].z)
 					else
 						p_1 = vmath.vector3(v[5].x,v[5].y,v[5].z)
 					end
-					
+
 					msg.post("@render:", "draw_line", {start_point = p_0, end_point = p_1, color = debug_colors[f]})
 				end 
 			end
 		end
 
-		for _, p in pairs(self.frustum_debug.positions) do
+		for k, p in pairs(self.frustum_debug.centers) do
 			local fp = vmath.vector3(p.x,p.y,p.z)
 			go.set_position(fp, self.frustum_spheres[sphere_i])
 			sphere_i = sphere_i + 1
 		end
-
-		--[[
-		for k, p in pairs(self.frustum_debug.dirs) do
-			local fp = self.frustum_debug.positions[k]
-			local s = vmath.vector3(fp.x,fp.y,fp.z)
-			local e = vmath.vector3(p.x, p.y, p.z)
-			local c = debug_colors[k]
-			
-			msg.post("@render:", "draw_line", {start_point = s, end_point = e, color = c})
-		end
-		]]
 	end
 end
 
-function on_input(self, action_id, action)
+function update(self, dt)
+	self.time = self.time + dt
+	
+	-- Update camera
+	if self.camera == 1 then
+		self.view.transform_debug = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw_debug,self.pitch_debug), self.zoom_debug)
+	else
+		self.view.transform = get_matrix_from_rot_zoom(get_rotation_from_yaw_pitch(self.yaw,self.pitch), self.zoom)
+	end
+	
+	msg.post("@render:", "set_view", self.view)
+
+	-- Update scene
+	local pos        = go.get_position("/shadow_sphere")
+	local pos_offset = 10
+	pos.x = math.sin(self.time) * pos_offset
+	pos.z = math.cos(self.time) * pos_offset
+	go.set_position(pos,"/shadow_sphere")
+
+	update_debug(self)
+end
+
+function on_input_handle_light(self, action_id, action)
 	if action_id == hash("M_LEFT") then
-		self.did_input = true
+		self.yaw_light    = self.yaw_light + action.dx
+		self.pitch_light  = self.pitch_light - action.dy
+		self.light_vector = get_rotation_from_yaw_pitch(self.yaw_light, self.pitch_light)
+		msg.post("@render:", "set_light_direction",  { direction = self.light_vector })
+	end
+end
+
+function on_input_handle_camera(self, action_id, action)
+	if action_id == hash("M_LEFT") then
 		if self.camera == 1 then
 			self.yaw_debug = self.yaw_debug + action.dx
 			self.pitch_debug = self.pitch_debug - action.dy
@@ -149,8 +155,24 @@ function on_input(self, action_id, action)
 		end
 	elseif action_id == hash("M_CHANGE_CAMERA") and action.pressed then
 		self.camera = -self.camera
-
 		msg.post("@render:", "set_camera_id", { camera = self.camera })
+	end
+end
+
+function on_input(self, action_id, action)
+
+	if action_id == hash("M_MOVE_LIGHT") then
+		if action.pressed then
+			self.do_move_light = true
+		elseif action.released then
+			self.do_move_light = false
+		end
+	end
+
+	if self.do_move_light then
+		on_input_handle_light(self, action_id, action)
+	else
+		on_input_handle_camera(self, action_id, action)
 	end
 end
 

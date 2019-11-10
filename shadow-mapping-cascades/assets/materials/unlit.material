@@ -1,6 +1,6 @@
 name: "model"
 tags: "frustum_debug_pred"
-vertex_program: "/assets/materials/standard.vp"
+vertex_program: "/assets/materials/unlit.vp"
 fragment_program: "/assets/materials/unlit.fp"
 vertex_space: VERTEX_SPACE_WORLD
 vertex_constants {
@@ -26,36 +26,6 @@ vertex_constants {
 vertex_constants {
   name: "mtx_proj"
   type: CONSTANT_TYPE_PROJECTION
-  value {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 0.0
-  }
-}
-vertex_constants {
-  name: "mtx_normal"
-  type: CONSTANT_TYPE_NORMAL
-  value {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 0.0
-  }
-}
-vertex_constants {
-  name: "light"
-  type: CONSTANT_TYPE_USER
-  value {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
-  }
-}
-vertex_constants {
-  name: "mtx_world"
-  type: CONSTANT_TYPE_WORLD
   value {
     x: 0.0
     y: 0.0
