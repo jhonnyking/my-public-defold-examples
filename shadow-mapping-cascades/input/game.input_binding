@@ -1,0 +1,16 @@
+key_trigger {
+  input: KEY_SPACE
+  action: "M_CHANGE_CAMERA"
+}
+key_trigger {
+  input: KEY_LCTRL
+  action: "M_MOVE_LIGHT"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "M_LEFT"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_RIGHT
+  action: "M_RIGHT"
+}
