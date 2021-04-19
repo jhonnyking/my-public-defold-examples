@@ -1,4 +1,6 @@
 varying mediump vec2 var_texcoord0;
+varying mediump vec4 var_position_world;
+varying mediump vec4 var_light;
 uniform lowp sampler2D tex0;
 
 float rgba_to_float(vec4 rgba)

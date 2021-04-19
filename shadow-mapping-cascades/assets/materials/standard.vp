@@ -13,6 +13,7 @@ uniform mediump mat4 mtx_view;
 uniform mediump mat4 mtx_world;
 uniform mediump mat4 mtx_proj;
 uniform mediump mat4 mtx_normal;
+varying mediump vec4 var_light;
 
 uniform mediump vec4 camera_mvp_mvp0;
 uniform mediump vec4 camera_mvp_mvp1;
@@ -35,7 +36,6 @@ uniform mediump vec4 mtx_light_2_mvp2;
 uniform mediump vec4 mtx_light_2_mvp3;
 
 varying mediump vec4 var_position;
-varying mediump vec4 var_position_world;
 varying mediump vec4 var_position_clip;
 varying mediump vec3 var_normal;
 varying mediump vec2 var_texcoord0;
@@ -52,9 +52,9 @@ void main()
     
     vec4 p               = mtx_worldview * vec4(position.xyz, 1.0);
     vec4 p_w             = mtx_world * vec4(position.xyz, 1.0);
-    
+
+    var_light            = vec4(0.0);
     var_position         = p;
-    var_position_world   = p_w;
     var_texcoord0        = texcoord0;
     var_normal           = normalize((mtx_normal * vec4(normal, 0.0)).xyz);
 

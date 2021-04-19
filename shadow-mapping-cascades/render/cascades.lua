@@ -1,6 +1,6 @@
 local function create_cascade_buffer(id, w, h)
 	local color_params = {
-		format     = 20, -- render.FORMAT_RGBA,
+		format     = 24, -- render.FORMAT_RGBA,
 		width      = w,
 		height     = h,
 		min_filter = render.FILTER_NEAREST,
