@@ -1,0 +1,7 @@
+mesh: "/builtins/assets/meshes/quad_2x2.dae"
+material: "/assets/materials/render_pass_composite.material"
+textures: "/assets/images/brown.png"
+skeleton: ""
+animations: ""
+default_animation: ""
+name: "unnamed"

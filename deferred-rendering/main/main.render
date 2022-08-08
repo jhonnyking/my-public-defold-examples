@@ -1,0 +1,13 @@
+script: "/main/main.render_script"
+materials {
+  name: "render_pass_gbuffer_material"
+  material: "/assets/materials/render_pass_gbuffer.material"
+}
+materials {
+  name: "render_pass_composite_material"
+  material: "/assets/materials/render_pass_composite.material"
+}
+materials {
+  name: "render_pass_debug_lights"
+  material: "/assets/materials/render_pass_debug_lights.material"
+}

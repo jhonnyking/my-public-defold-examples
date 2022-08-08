@@ -1,0 +1,43 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	msg.post("@render:", "use_camera_projection")
+	msg.post("camera", "acquire_camera_focus")
+
+	self.lights = {}
+	self.time = 0
+	
+	local num_lights = 10
+
+	math.randomseed(socket.gettime()*10000)
+	for i = 1, num_lights do
+		local light  = {}
+		local light_pos = vmath.vector3(math.random(-20, 20), math.random(1, 3), math.random(-20, 20))
+		local light_col = vmath.vector4(math.random(), math.random(), math.random(), 0)
+		light.go     = factory.create("/main#point_light_factory", light_pos)
+		light.radius = math.random(1, 10)
+		light.speed  = math.random(1, 2.5)
+		light.pos    = light_pos
+		light.dir    = math.random(-1, 1)
+		
+		if light.dir > 0 then
+			light.dir = 1
+		else
+			light.dir = -1
+		end
+
+		local light_url = msg.url(nil, light.go, "light")
+		go.set(light_url, "light_color", light_col)
+
+		table.insert(self.lights, light)
+	end
+end
+
+function update(self, dt)
+	for k, v in pairs(self.lights) do
+		local l_x = v.pos.x + math.sin(self.time * v.speed * v.dir) * v.radius
+		local l_z = v.pos.z + math.cos(self.time * v.speed * v.dir) * v.radius
+		local l_p = vmath.vector3(l_x, v.pos.y, l_z)
+		go.set_position(l_p, v.go)
+	end
+	self.time = self.time + dt
+end

@@ -1,0 +1,2 @@
+prototype: "/assets/lights/point_light.go"
+load_dynamically: false
