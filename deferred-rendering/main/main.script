@@ -3,12 +3,21 @@ function init(self)
 	msg.post("@render:", "use_camera_projection")
 	msg.post("camera", "acquire_camera_focus")
 
+	self.debug_mode  = 1
+	self.debug_modes = {
+		{"default"},
+		{"light_volumes"},
+		{"light_only"},
+		{"no_light"}
+	}
+
 	self.lights = {}
 	self.time = 0
 	
 	local num_lights = 10
 
 	math.randomseed(socket.gettime()*10000)
+	--[[
 	for i = 1, num_lights do
 		local light  = {}
 		local light_pos = vmath.vector3(math.random(-20, 20), math.random(1, 3), math.random(-20, 20))
@@ -30,6 +39,7 @@ function init(self)
 
 		table.insert(self.lights, light)
 	end
+	--]]
 end
 
 function update(self, dt)
@@ -41,3 +51,36 @@ function update(self, dt)
 	end
 	self.time = self.time + dt
 end
+
+function on_input(self, action_id, action)
+	if action_id == hash("on_space") and action.pressed then
+		self.debug_mode = self.debug_mode + 1
+
+		if self.debug_mode > #self.debug_modes then
+			self.debug_mode = 1
+		end
+
+		msg.post("@render:", "debug_mode", { debug_mode = self.debug_mode })
+	end
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("add_light") then
+		local light = {}
+		light.radius = math.random(1, 10)
+		light.speed  = math.random(0.75, 2.0)
+		light.pos    = go.get_position(message.id)
+		light.dir    = math.random(-1, 1)
+		light.go     = message.id
+
+		if light.dir > 0 then
+			light.dir = 1
+		else
+			light.dir = -1
+		end
+
+		table.insert(self.lights, light)
+	end
+end
+
+

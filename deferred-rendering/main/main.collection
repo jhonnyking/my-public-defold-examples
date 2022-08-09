@@ -1,4 +1,228 @@
 name: "main"
+instances {
+  id: "point_light"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: -4.567
+    y: -0.144
+    z: 2.725
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "1.0, 1.0, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 19.862
+    y: 19.862
+    z: 19.862
+  }
+}
+instances {
+  id: "point_light1"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 3.407
+    y: 2.64
+    z: 1.211
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.8, 0.5, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 11.545
+    y: 11.545
+    z: 11.545
+  }
+}
+instances {
+  id: "point_light2"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: -11.379
+    y: 11.71
+    z: -8.845
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "1.0, 1.0, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 40.434
+    y: 40.434
+    z: 40.434
+  }
+}
+instances {
+  id: "point_light3"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 16.805
+    y: 7.738
+    z: -18.368
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "1.0, 1.0, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 35.276
+    y: 35.276
+    z: 35.276
+  }
+}
+instances {
+  id: "point_light4"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 7.44
+    y: 1.57
+    z: 3.985
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.1, 0.4, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 9.728
+    y: 9.728
+    z: 9.728
+  }
+}
+instances {
+  id: "point_light5"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 0.034
+    y: 4.427
+    z: -0.39
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.5, 0.8, 0.1, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 16.635
+    y: 16.635
+    z: 16.635
+  }
+}
+instances {
+  id: "point_light6"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: -5.479
+    y: 3.354
+    z: 11.174
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.5, 0.8, 0.9, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 21.353
+    y: 21.353
+    z: 21.353
+  }
+}
+instances {
+  id: "point_light7"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 12.862
+    y: 0.65
+    z: 3.17
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.5, 0.8, 0.1, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 9.316
+    y: 9.316
+    z: 9.316
+  }
+}
 scale_along_z: 0
 embedded_instances {
   id: "scene"
@@ -7,9 +231,9 @@ embedded_instances {
   "  id: \"cube\"\n"
   "  component: \"/assets/models/cube.model\"\n"
   "  position {\n"
-  "    x: 0.0\n"
+  "    x: -2.946\n"
   "    y: 0.0\n"
-  "    z: 0.0\n"
+  "    z: 0.562\n"
   "  }\n"
   "  rotation {\n"
   "    x: 0.0\n"
@@ -25,6 +249,66 @@ embedded_instances {
   "    x: 1.5\n"
   "    y: 0.0\n"
   "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"sphere1\"\n"
+  "  component: \"/assets/models/sphere.model\"\n"
+  "  position {\n"
+  "    x: 0.491\n"
+  "    y: 0.0\n"
+  "    z: -3.785\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"sphere2\"\n"
+  "  component: \"/assets/models/sphere.model\"\n"
+  "  position {\n"
+  "    x: 3.14\n"
+  "    y: 0.0\n"
+  "    z: -0.455\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"cube1\"\n"
+  "  component: \"/assets/models/cube.model\"\n"
+  "  position {\n"
+  "    x: -1.735\n"
+  "    y: 0.0\n"
+  "    z: -3.458\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"cube2\"\n"
+  "  component: \"/assets/models/cube.model\"\n"
+  "  position {\n"
+  "    x: -1.735\n"
+  "    y: 0.997\n"
+  "    z: -3.458\n"
   "  }\n"
   "  rotation {\n"
   "    x: 0.0\n"
@@ -53,6 +337,9 @@ embedded_instances {
 }
 embedded_instances {
   id: "go"
+  children: "wall_left"
+  children: "wall_left1"
+  children: "wall_right"
   data: "components {\n"
   "  id: \"quad\"\n"
   "  component: \"/assets/models/quad.model\"\n"
@@ -66,6 +353,21 @@ embedded_instances {
   "    y: 0.0\n"
   "    z: 0.0\n"
   "    w: 0.70504606\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.491\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.70710677\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
   "  }\n"
   "}\n"
   ""
@@ -176,19 +478,152 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 2.445
-    y: 9.046
-    z: 37.09
+    x: 2.315
+    y: 15.461
+    z: 37.106
   }
   rotation {
-    x: -0.20077892
-    y: -4.6021467E-18
-    z: 1.7143679E-18
-    w: 0.97963655
+    x: -0.10142961
+    y: 0.0
+    z: 0.0
+    w: 0.9948427
   }
   scale3 {
     x: 1.0
     y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "lights"
+  children: "point_light"
+  children: "point_light1"
+  children: "point_light2"
+  children: "point_light3"
+  children: "point_light4"
+  children: "point_light5"
+  children: "point_light6"
+  children: "point_light7"
+  data: ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_left"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: -0.499\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_right"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: 0.5\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 1.0
+    z: 0.0
+    w: 6.123234E-17
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_left1"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: -0.499\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: -0.70710677
+    z: 0.0
+    w: 0.70710677
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
     z: 1.0
   }
 }

@@ -21,8 +21,9 @@ vec3 lighting_diffuse(vec3 pos, vec3 nor, vec3 albedo, vec3 light_pos)
     vec3 light_dir    = normalize(light_vec);
     float distance    = length(light_vec);
     vec3 diffuse      = max(dot(nor, light_dir), 0.0) * albedo * u_light_color.rgb;
-    float attenuation = 1.0 / (1.0 + linear * distance + quadratic * distance * distance);
 
+    float attenuation = smoothstep(radius, 0, distance);
+    //float attenuation = 1.0; // 1.0 / (1.0 + linear * distance + quadratic * distance * distance);
     return diffuse * attenuation;
 }
 

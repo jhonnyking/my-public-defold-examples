@@ -30,6 +30,11 @@ local function get_projection(self)
     return self.projection_fn(self.near, self.far, self.zoom)
 end
 
+DEBUG_MODE_DEFAULT = 1
+DEBUG_MODE_LIGHT_VOLUMES = 2
+DEBUG_MODE_LIGHT_ONLY = 3
+DEBUG_MODE_NO_LIGHT = 4
+
 function init(self)
     self.tile_pred = render.predicate({"tile"})
     self.gui_pred = render.predicate({"gui"})
@@ -40,6 +45,8 @@ function init(self)
     self.composite_pred = render.predicate({"composite"})
     
     self.clear_color = vmath.vector4(0, 0, 0, 1)
+
+    self.debug_mode = DEBUG_MODE_DEFAULT
 
     self.view = vmath.matrix4()
 
@@ -94,7 +101,7 @@ end
 function render_pass_gbuffer(self)
     render.set_render_target(self.rt_gbuffer)
 
-    render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+    render.clear({[render.BUFFER_COLOR_BIT] = vmath.vector4(0.1,0.1,0.1,1), [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
     render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
     
     render.enable_material("render_pass_gbuffer_material")
@@ -102,7 +109,7 @@ function render_pass_gbuffer(self)
     render.set_depth_mask(true)
     render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
     render.enable_state(render.STATE_CULL_FACE)
-    --render.enable_state(render.STATE_DEPTH_TEST)
+    render.enable_state(render.STATE_DEPTH_TEST)
     render.disable_state(render.STATE_BLEND)
 
     render.draw(self.model_pred)
@@ -111,8 +118,24 @@ function render_pass_gbuffer(self)
     render.set_render_target(render.RENDER_TARGET_DEFAULT)
 end
 
+function render_pass_models(self)
+    render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+    render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
+
+    render.set_depth_mask(true)
+    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
+    render.enable_state(render.STATE_CULL_FACE)
+    render.enable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_BLEND)
+
+    render.draw(self.model_pred)
+end
+
 function render_pass_lighting(self)
     self.constants.u_window_size = vmath.vector4(render.get_window_width(), render.get_window_height(), 0, 0)
+
+    render.disable_state(render.STATE_CULL_FACE)
+    render.disable_state(render.STATE_DEPTH_TEST)
     
     render.enable_state(render.STATE_BLEND)
     render.set_blend_func(render.BLEND_ONE, render.BLEND_ONE)
@@ -160,26 +183,31 @@ function update(self)
     render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
     render.set_view(self.view)
 
+    --[[
     render.set_depth_mask(false)
     render.disable_state(render.STATE_DEPTH_TEST)
     render.disable_state(render.STATE_STENCIL_TEST)
     render.enable_state(render.STATE_BLEND)
     render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
     render.disable_state(render.STATE_CULL_FACE)
+    --]]
 
     render.set_projection(get_projection(self))
-
-    render.draw(self.tile_pred)
-    render.draw(self.particle_pred)
-    render.draw_debug3d()
-
-    render_pass_gbuffer(self)
-
-    render_pass_composite(self)
     
-    render_pass_lighting(self)
-
-    --render_debug_lights(self)
+    if self.debug_mode == DEBUG_MODE_DEFAULT then
+        render_pass_gbuffer(self)
+        render_pass_composite(self)
+        render_pass_lighting(self)
+    elseif self.debug_mode == DEBUG_MODE_LIGHT_VOLUMES then
+        render_pass_gbuffer(self)
+        render_pass_composite(self)
+        render_pass_lighting(self)
+        render_debug_lights(self)
+    elseif self.debug_mode == DEBUG_MODE_LIGHT_ONLY then
+        render_pass_lighting(self)
+    elseif self.debug_mode == DEBUG_MODE_NO_LIGHT then
+        render_pass_models(self)
+    end
 
     -- debug rendering
     --
@@ -219,5 +247,7 @@ function on_message(self, message_id, message)
         self.near = message.near or -1
         self.far = message.far or 1
         self.projection_fn = fixed_fit_projection
+    elseif message_id == hash("debug_mode") then
+        self.debug_mode = message.debug_mode
     end
 end

@@ -1,33 +1,36 @@
 go.property("light_color", vmath.vector4(1,1,1,1))
-go.property("light_constant", 1)
-go.property("light_linear", 0.7)
-go.property("light_quadratic", 1.8)
+--go.property("light_constant", 1)
+--go.property("light_linear", 0.7)
+--go.property("light_quadratic", 1.8)
 
 function init(self)
 	self.light_properties = vmath.vector4()
 	self.light_position = vmath.vector4()
+
+	msg.post("/main#main", "add_light", {id = go.get_id()})
 end
 
 function update(self, dt)
-	local constant  = self.light_constant
-	local linear    = self.light_linear
-	local quadratic = self.light_quadratic
+	--local constant  = self.light_constant
+	--local linear    = self.light_linear
+	--local quadratic = self.light_quadratic
 
-	local max_brightness = math.max(self.light_color.x, self.light_color.y, self.light_color.z)
-	local radius = (-linear + math.sqrt(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * max_brightness))) / (2.0 * quadratic);
-
+	--local max_brightness = math.max(self.light_color.x, self.light_color.y, self.light_color.z)
+	--local radius = (-linear + math.sqrt(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * max_brightness))) / (2.0 * quadratic);
 	-- print(radius)
+
+	local radius = go.get_scale()
 	
-	self.light_properties.x = linear
-	self.light_properties.y = quadratic
-	self.light_properties.z = radius
+	self.light_properties.x = 0 -- linear
+	self.light_properties.y = 0 -- quadratic
+	self.light_properties.z = radius.x * 0.5
 
 	local p = go.get_world_position()
 	self.light_position.x = p.x
 	self.light_position.y = p.y
 	self.light_position.z = p.z
 
-	go.set_scale(radius * 2)
+	go.set_scale(radius)
 
 	go.set("#model", "u_light_color", self.light_color)
 	go.set("#model", "u_light_position", self.light_position)

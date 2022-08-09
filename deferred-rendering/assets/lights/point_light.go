@@ -12,16 +12,6 @@ components {
     z: 0.0
     w: 1.0
   }
-  properties {
-    id: "light_linear"
-    value: "0.2"
-    type: PROPERTY_TYPE_NUMBER
-  }
-  properties {
-    id: "light_quadratic"
-    value: "1.0"
-    type: PROPERTY_TYPE_NUMBER
-  }
 }
 embedded_components {
   id: "model"
