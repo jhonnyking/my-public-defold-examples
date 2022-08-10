@@ -1,0 +1,484 @@
+name: "main"
+instances {
+  id: "point_light"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 12.726
+    y: 4.77
+    z: -5.541
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "1.0, 1.0, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 24.996
+    y: 24.996
+    z: 24.996
+  }
+}
+instances {
+  id: "point_light1"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: -7.086
+    y: 6.999
+    z: -1.338
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "1.0, 1.0, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 18.288
+    y: 18.288
+    z: 18.288
+  }
+}
+instances {
+  id: "point_light2"
+  prototype: "/assets/lights/point_light.go"
+  position {
+    x: 0.511
+    y: 1.857
+    z: -1.338
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  component_properties {
+    id: "light"
+    properties {
+      id: "light_color"
+      value: "0.6, 0.6, 1.0, 1.0"
+      type: PROPERTY_TYPE_VECTOR4
+    }
+  }
+  scale3 {
+    x: 10.828
+    y: 10.828
+    z: 10.828
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "scene"
+  children: "go"
+  data: "components {\n"
+  "  id: \"cube\"\n"
+  "  component: \"/assets/models/cube.model\"\n"
+  "  position {\n"
+  "    x: -2.946\n"
+  "    y: 0.0\n"
+  "    z: 0.562\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"sphere\"\n"
+  "  component: \"/assets/models/sphere.model\"\n"
+  "  position {\n"
+  "    x: 1.5\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"sphere1\"\n"
+  "  component: \"/assets/models/sphere.model\"\n"
+  "  position {\n"
+  "    x: 0.491\n"
+  "    y: 0.0\n"
+  "    z: -3.785\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"sphere2\"\n"
+  "  component: \"/assets/models/sphere.model\"\n"
+  "  position {\n"
+  "    x: 3.14\n"
+  "    y: 0.0\n"
+  "    z: -0.455\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"cube1\"\n"
+  "  component: \"/assets/models/cube.model\"\n"
+  "  position {\n"
+  "    x: -1.735\n"
+  "    y: 0.0\n"
+  "    z: -3.458\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"cube2\"\n"
+  "  component: \"/assets/models/cube.model\"\n"
+  "  position {\n"
+  "    x: -1.735\n"
+  "    y: 0.997\n"
+  "    z: -3.458\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: -1.436
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 3.14
+    y: 3.14
+    z: 3.14
+  }
+}
+embedded_instances {
+  id: "go"
+  children: "wall_left"
+  children: "wall_left1"
+  children: "wall_right"
+  data: "components {\n"
+  "  id: \"quad\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: -0.7091615\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 0.70504606\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.491\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.70710677\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1.335
+    y: -0.494
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 15.86
+    y: 15.86
+    z: 15.86
+  }
+}
+embedded_instances {
+  id: "main"
+  data: "components {\n"
+  "  id: \"main\"\n"
+  "  component: \"/main/main.script\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"quad_fs\"\n"
+  "  component: \"/assets/models/quad_fs.model\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"point_light_factory\"\n"
+  "  component: \"/assets/lights/point_light_factory.factory\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "camera"
+  data: "embedded_components {\n"
+  "  id: \"camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 1.0\\n"
+  "near_z: 0.1\\n"
+  "far_z: 1000.0\\n"
+  "auto_aspect_ratio: 1\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 2.509
+    y: 3.932
+    z: 26.276
+  }
+  rotation {
+    x: -0.10142961
+    y: 0.0
+    z: 0.0
+    w: 0.9948427
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "lights"
+  children: "point_light"
+  children: "point_light1"
+  children: "point_light2"
+  data: ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_left"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: -0.499\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_right"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: 0.5\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 1.0
+    z: 0.0
+    w: 6.123234E-17
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "wall_left1"
+  data: "components {\n"
+  "  id: \"quad1\"\n"
+  "  component: \"/assets/models/quad.model\"\n"
+  "  position {\n"
+  "    x: -0.499\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.70710677\n"
+  "    z: 0.0\n"
+  "    w: 0.70710677\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.246
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: -0.70710677
+    z: 0.0
+    w: 0.70710677
+  }
+  scale3 {
+    x: 1.0
+    y: 0.5
+    z: 1.0
+  }
+}

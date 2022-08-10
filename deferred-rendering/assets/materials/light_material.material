@@ -1,0 +1,92 @@
+name: "light_material"
+tags: "light"
+vertex_program: "/assets/materials/light_material.vp"
+fragment_program: "/assets/materials/light_material.fp"
+vertex_space: VERTEX_SPACE_LOCAL
+vertex_constants {
+  name: "mtx_worldview"
+  type: CONSTANT_TYPE_WORLDVIEW
+}
+vertex_constants {
+  name: "mtx_view"
+  type: CONSTANT_TYPE_VIEW
+}
+vertex_constants {
+  name: "mtx_proj"
+  type: CONSTANT_TYPE_PROJECTION
+}
+vertex_constants {
+  name: "mtx_normal"
+  type: CONSTANT_TYPE_NORMAL
+}
+fragment_constants {
+  name: "u_window_size"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+}
+fragment_constants {
+  name: "u_light_position"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+fragment_constants {
+  name: "u_light_color"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+fragment_constants {
+  name: "u_light_properties"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+fragment_constants {
+  name: "mtx_view"
+  type: CONSTANT_TYPE_VIEW
+  value {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+}
+samplers {
+  name: "tex_positions"
+  wrap_u: WRAP_MODE_CLAMP_TO_EDGE
+  wrap_v: WRAP_MODE_CLAMP_TO_EDGE
+  filter_min: FILTER_MODE_MIN_LINEAR
+  filter_mag: FILTER_MODE_MAG_LINEAR
+}
+samplers {
+  name: "tex_normals"
+  wrap_u: WRAP_MODE_CLAMP_TO_EDGE
+  wrap_v: WRAP_MODE_CLAMP_TO_EDGE
+  filter_min: FILTER_MODE_MIN_LINEAR
+  filter_mag: FILTER_MODE_MAG_LINEAR
+}
+samplers {
+  name: "tex_albedo"
+  wrap_u: WRAP_MODE_CLAMP_TO_EDGE
+  wrap_v: WRAP_MODE_CLAMP_TO_EDGE
+  filter_min: FILTER_MODE_MIN_LINEAR
+  filter_mag: FILTER_MODE_MAG_LINEAR
+}

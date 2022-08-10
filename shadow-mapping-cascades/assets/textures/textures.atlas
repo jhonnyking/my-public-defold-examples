@@ -1,0 +1,6 @@
+images {
+  image: "/assets/textures/concrete.jpg"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0
