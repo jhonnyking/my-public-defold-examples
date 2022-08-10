@@ -134,10 +134,13 @@ end
 function render_pass_lighting(self)
     self.constants.u_window_size = vmath.vector4(render.get_window_width(), render.get_window_height(), 0, 0)
 
-    render.disable_state(render.STATE_CULL_FACE)
-    render.disable_state(render.STATE_DEPTH_TEST)
+    render.set_depth_mask(false)
     
+    --render.set_cull_face(render.FACE_FRONT)
+    render.enable_state(render.STATE_CULL_FACE)
+    render.enable_state(render.STATE_DEPTH_TEST)
     render.enable_state(render.STATE_BLEND)
+
     render.set_blend_func(render.BLEND_ONE, render.BLEND_ONE)
     
     render.enable_texture(0, self.rt_gbuffer, render.BUFFER_COLOR0_BIT)
@@ -149,30 +152,54 @@ function render_pass_lighting(self)
     render.disable_texture(0)
     render.disable_texture(1)
     render.disable_texture(2)
+    render.set_cull_face(render.FACE_BACK)
+
+    render.set_depth_mask(true)
+end
+
+function render_pass_depth(self)
+    render.set_depth_mask(true)
+    render.set_color_mask(false, false, false, false)
+    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
+    render.enable_state(render.STATE_CULL_FACE)
+    render.enable_state(render.STATE_DEPTH_TEST)
+    render.disable_state(render.STATE_BLEND)
+
+    render.draw(self.model_pred)
+    render.set_color_mask(true, true, true, true)
 end
 
 function render_pass_composite(self)
+    render.set_depth_mask(false)
     render.enable_material("render_pass_composite_material")
     render.enable_texture(0, self.rt_gbuffer, render.BUFFER_COLOR2_BIT)
+    render.enable_texture(1, self.rt_gbuffer, render.BUFFER_COLOR0_BIT)
     render.disable_state(render.STATE_DEPTH_TEST)
     render.disable_state(render.STATE_CULL_FACE)
     render.disable_state(render.STATE_BLEND)
     render.draw(self.composite_pred)
     render.disable_texture(0)
+    render.disable_texture(1)
     render.disable_material()
 end
 
 function render_debug_lights(self)
     render.enable_material("render_pass_debug_lights")
 
-    render.disable_state(render.STATE_DEPTH_TEST)
-    render.disable_state(render.STATE_CULL_FACE)
+    --render.set_cull_face(render.FACE_FRONT)
+    render.set_cull_face(render.FACE_BACK)
+    render.enable_state(render.STATE_CULL_FACE)
     render.enable_state(render.STATE_BLEND)
+    --render.set_depth_func(render.COMPARE_FUNC_LESS)
+    render.enable_state(render.STATE_DEPTH_TEST)
     render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
+
+    --render.set_blend_func(render.BLEND_ONE, render.BLEND_ONE)
     
     render.draw(self.light_pred)
     
     render.disable_material()
+    render.set_cull_face(render.FACE_BACK)
 end
 
 function update(self)
@@ -183,27 +210,21 @@ function update(self)
     render.set_viewport(0, 0, render.get_window_width(), render.get_window_height())
     render.set_view(self.view)
 
-    --[[
-    render.set_depth_mask(false)
-    render.disable_state(render.STATE_DEPTH_TEST)
-    render.disable_state(render.STATE_STENCIL_TEST)
-    render.enable_state(render.STATE_BLEND)
-    render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
-    render.disable_state(render.STATE_CULL_FACE)
-    --]]
-
     render.set_projection(get_projection(self))
     
     if self.debug_mode == DEBUG_MODE_DEFAULT then
         render_pass_gbuffer(self)
         render_pass_composite(self)
+        render_pass_depth(self)
         render_pass_lighting(self)
     elseif self.debug_mode == DEBUG_MODE_LIGHT_VOLUMES then
         render_pass_gbuffer(self)
         render_pass_composite(self)
+        render_pass_depth(self)
         render_pass_lighting(self)
         render_debug_lights(self)
     elseif self.debug_mode == DEBUG_MODE_LIGHT_ONLY then
+        render_pass_depth(self)
         render_pass_lighting(self)
     elseif self.debug_mode == DEBUG_MODE_NO_LIGHT then
         render_pass_models(self)

@@ -14,32 +14,21 @@ function init(self)
 	self.lights = {}
 	self.time = 0
 	
-	local num_lights = 10
+	local num_lights = 256
 
 	math.randomseed(socket.gettime()*10000)
-	--[[
 	for i = 1, num_lights do
-		local light  = {}
-		local light_pos = vmath.vector3(math.random(-20, 20), math.random(1, 3), math.random(-20, 20))
+		local radius    = math.random(2, 10)
+		local light     = {}
+		local light_pos = vmath.vector3(math.random(-18, 18), math.random(0, 4), math.random(-18, 18))
 		local light_col = vmath.vector4(math.random(), math.random(), math.random(), 0)
-		light.go     = factory.create("/main#point_light_factory", light_pos)
-		light.radius = math.random(1, 10)
-		light.speed  = math.random(1, 2.5)
-		light.pos    = light_pos
-		light.dir    = math.random(-1, 1)
-		
-		if light.dir > 0 then
-			light.dir = 1
-		else
-			light.dir = -1
-		end
+		local light_rad = vmath.vector3(radius, radius, radius)
+		local light     = factory.create("/main#point_light_factory", light_pos)
+		local light_url = msg.url(nil, light, "light")
 
-		local light_url = msg.url(nil, light.go, "light")
 		go.set(light_url, "light_color", light_col)
-
-		table.insert(self.lights, light)
+		go.set_scale(light_rad, light)
 	end
-	--]]
 end
 
 function update(self, dt)

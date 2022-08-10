@@ -26,3 +26,15 @@ bundle_identifier = com.defold.example.basic3d
 [ios]
 bundle_identifier = com.defold.example.basic3d
 
+[model]
+max_count = 2048
+
+[factory]
+max_count = 1024
+
+[collection]
+max_instances = 2048
+
+[graphics]
+max_draw_calls = 2048
+

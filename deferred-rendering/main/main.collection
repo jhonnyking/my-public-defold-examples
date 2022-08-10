@@ -3,9 +3,9 @@ instances {
   id: "point_light"
   prototype: "/assets/lights/point_light.go"
   position {
-    x: -4.567
-    y: -0.144
-    z: 2.725
+    x: 12.726
+    y: 4.77
+    z: -5.541
   }
   rotation {
     x: 0.0
@@ -22,18 +22,18 @@ instances {
     }
   }
   scale3 {
-    x: 19.862
-    y: 19.862
-    z: 19.862
+    x: 24.996
+    y: 24.996
+    z: 24.996
   }
 }
 instances {
   id: "point_light1"
   prototype: "/assets/lights/point_light.go"
   position {
-    x: 3.407
-    y: 2.64
-    z: 1.211
+    x: -7.086
+    y: 6.999
+    z: -1.338
   }
   rotation {
     x: 0.0
@@ -45,23 +45,23 @@ instances {
     id: "light"
     properties {
       id: "light_color"
-      value: "0.8, 0.5, 1.0, 1.0"
+      value: "1.0, 1.0, 1.0, 1.0"
       type: PROPERTY_TYPE_VECTOR4
     }
   }
   scale3 {
-    x: 11.545
-    y: 11.545
-    z: 11.545
+    x: 18.288
+    y: 18.288
+    z: 18.288
   }
 }
 instances {
   id: "point_light2"
   prototype: "/assets/lights/point_light.go"
   position {
-    x: -11.379
-    y: 11.71
-    z: -8.845
+    x: 0.511
+    y: 1.857
+    z: -1.338
   }
   rotation {
     x: 0.0
@@ -73,154 +73,14 @@ instances {
     id: "light"
     properties {
       id: "light_color"
-      value: "1.0, 1.0, 1.0, 1.0"
+      value: "0.6, 0.6, 1.0, 1.0"
       type: PROPERTY_TYPE_VECTOR4
     }
   }
   scale3 {
-    x: 40.434
-    y: 40.434
-    z: 40.434
-  }
-}
-instances {
-  id: "point_light3"
-  prototype: "/assets/lights/point_light.go"
-  position {
-    x: 16.805
-    y: 7.738
-    z: -18.368
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "light"
-    properties {
-      id: "light_color"
-      value: "1.0, 1.0, 1.0, 1.0"
-      type: PROPERTY_TYPE_VECTOR4
-    }
-  }
-  scale3 {
-    x: 35.276
-    y: 35.276
-    z: 35.276
-  }
-}
-instances {
-  id: "point_light4"
-  prototype: "/assets/lights/point_light.go"
-  position {
-    x: 7.44
-    y: 1.57
-    z: 3.985
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "light"
-    properties {
-      id: "light_color"
-      value: "0.1, 0.4, 1.0, 1.0"
-      type: PROPERTY_TYPE_VECTOR4
-    }
-  }
-  scale3 {
-    x: 9.728
-    y: 9.728
-    z: 9.728
-  }
-}
-instances {
-  id: "point_light5"
-  prototype: "/assets/lights/point_light.go"
-  position {
-    x: 0.034
-    y: 4.427
-    z: -0.39
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "light"
-    properties {
-      id: "light_color"
-      value: "0.5, 0.8, 0.1, 1.0"
-      type: PROPERTY_TYPE_VECTOR4
-    }
-  }
-  scale3 {
-    x: 16.635
-    y: 16.635
-    z: 16.635
-  }
-}
-instances {
-  id: "point_light6"
-  prototype: "/assets/lights/point_light.go"
-  position {
-    x: -5.479
-    y: 3.354
-    z: 11.174
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "light"
-    properties {
-      id: "light_color"
-      value: "0.5, 0.8, 0.9, 1.0"
-      type: PROPERTY_TYPE_VECTOR4
-    }
-  }
-  scale3 {
-    x: 21.353
-    y: 21.353
-    z: 21.353
-  }
-}
-instances {
-  id: "point_light7"
-  prototype: "/assets/lights/point_light.go"
-  position {
-    x: 12.862
-    y: 0.65
-    z: 3.17
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "light"
-    properties {
-      id: "light_color"
-      value: "0.5, 0.8, 0.1, 1.0"
-      type: PROPERTY_TYPE_VECTOR4
-    }
-  }
-  scale3 {
-    x: 9.316
-    y: 9.316
-    z: 9.316
+    x: 10.828
+    y: 10.828
+    z: 10.828
   }
 }
 scale_along_z: 0
@@ -478,9 +338,9 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 2.315
-    y: 15.461
-    z: 37.106
+    x: 2.509
+    y: 3.932
+    z: 26.276
   }
   rotation {
     x: -0.10142961
@@ -499,11 +359,6 @@ embedded_instances {
   children: "point_light"
   children: "point_light1"
   children: "point_light2"
-  children: "point_light3"
-  children: "point_light4"
-  children: "point_light5"
-  children: "point_light6"
-  children: "point_light7"
   data: ""
   position {
     x: 0.0

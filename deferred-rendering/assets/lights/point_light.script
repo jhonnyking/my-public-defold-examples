@@ -21,8 +21,8 @@ function update(self, dt)
 
 	local radius = go.get_scale()
 	
-	self.light_properties.x = 0 -- linear
-	self.light_properties.y = 0 -- quadratic
+	self.light_properties.x = 0 -- linear, skipped for now
+	self.light_properties.y = 0 -- quadratic, skipped for now
 	self.light_properties.z = radius.x * 0.5
 
 	local p = go.get_world_position()
@@ -30,7 +30,7 @@ function update(self, dt)
 	self.light_position.y = p.y
 	self.light_position.z = p.z
 
-	go.set_scale(radius)
+	-- go.set_scale(radius)
 
 	go.set("#model", "u_light_color", self.light_color)
 	go.set("#model", "u_light_position", self.light_position)
